@@ -236,7 +236,6 @@ class MainServer < Stratum::Server
       end
     end
 
-    p pool_workers_taken.class, hashrate_taken
     [pool_workers_taken, hashrate_taken]
   end
 

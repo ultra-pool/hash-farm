@@ -131,10 +131,16 @@ module Stratum
         @socket.write( data )
         log.info "Data sent (#{data[0...80]})."
       end
-    rescue Errno::EPIPE
+    rescue Errno::EPIPE, Errno::ECONNRESET
       log.warn "Connection lost to #{ip_port}. Retry..."
       self.connect
       mining.on('subscribed') do self.send_data data end
+    rescue => err
+      log.error "Error during send_data to #{ip_port} : #{err}. Retry...\n#{err.backtrace[0]}"
+      count ||= 0
+      count += 1
+      sleep(0.1)
+      retry if count < 3
     end
 
     def close

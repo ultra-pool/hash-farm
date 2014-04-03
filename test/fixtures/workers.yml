@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: :one
+  name: MyString
+  is_anonymous: false
+
+two:
+  user: :two
+  is_anonymous: true
+
+barbu1:
+  user: :barbu
+  name: barbu1
+  is_anonymous: false

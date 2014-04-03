@@ -1,0 +1,35 @@
+<h1>Listing transactions</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Coin</th>
+      <th>Raw</th>
+      <th>Txid</th>
+      <th>Ourid</th>
+      <th>Block</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @transactions.each do |transaction| %>
+      <tr>
+        <td><%= transaction.coin %></td>
+        <td><%= transaction.raw %></td>
+        <td><%= transaction.txid %></td>
+        <td><%= transaction.ourid %></td>
+        <td><%= transaction.block %></td>
+        <td><%= link_to 'Show', transaction %></td>
+        <td><%= link_to 'Edit', edit_transaction_path(transaction) %></td>
+        <td><%= link_to 'Destroy', transaction, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Transaction', new_transaction_path %>

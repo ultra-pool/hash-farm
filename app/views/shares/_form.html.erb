@@ -1,0 +1,45 @@
+<%= form_for(@share) do |f| %>
+  <% if @share.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@share.errors.count, "error") %> prohibited this share from being saved:</h2>
+
+      <ul>
+      <% @share.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :worker %><br>
+    <%= f.text_field :worker %>
+  </div>
+  <div class="field">
+    <%= f.label :solution %><br>
+    <%= f.text_field :solution %>
+  </div>
+  <div class="field">
+    <%= f.label :difficulty %><br>
+    <%= f.text_field :difficulty %>
+  </div>
+  <div class="field">
+    <%= f.label :our_result %><br>
+    <%= f.check_box :our_result %>
+  </div>
+  <div class="field">
+    <%= f.label :pool_result %><br>
+    <%= f.check_box :pool_result %>
+  </div>
+  <div class="field">
+    <%= f.label :reason %><br>
+    <%= f.text_field :reason %>
+  </div>
+  <div class="field">
+    <%= f.label :is_block %><br>
+    <%= f.check_box :is_block %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

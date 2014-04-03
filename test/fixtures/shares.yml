@@ -1,0 +1,64 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  worker: one
+  solution: MyString
+  difficulty: 1.5
+  our_result: false
+  pool_result: false
+  reason: MyString
+  is_block: false
+
+two:
+  worker: two
+  solution: MyString
+  difficulty: 1.5
+  our_result: false
+  pool_result: false
+  reason: MyString
+  is_block: false
+
+payout1:
+  worker: one
+  solution: MyString
+  difficulty: 1.0
+  our_result: true
+  pool_result: true
+  reason: MyString
+  is_block: false
+
+payout2:
+  worker: two
+  solution: MyString
+  difficulty: 1.0
+  our_result: true
+  pool_result: true
+  reason: MyString
+  is_block: false
+
+payout3:
+  worker: one
+  solution: MyString
+  difficulty: 2.0
+  our_result: true
+  pool_result: false
+  reason: MyString
+  is_block: false
+
+payout4:
+  worker: two
+  solution: MyString
+  difficulty: 1.5
+  our_result: false
+  pool_result: false
+  reason: MyString
+  is_block: false
+
+payout5:
+  worker: barbu1
+  solution: MyString
+  difficulty: 0.01
+  our_result: true
+  pool_result: true
+  reason: MyString
+  is_block: false

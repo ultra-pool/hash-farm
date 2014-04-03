@@ -1,0 +1,57 @@
+<%= form_for(@coin) do |f| %>
+  <% if @coin.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@coin.errors.count, "error") %> prohibited this coin from being saved:</h2>
+
+      <ul>
+      <% @coin.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.number_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :code %><br>
+    <%= f.text_field :code %>
+  </div>
+  <div class="field">
+    <%= f.label :second_per_block %><br>
+    <%= f.number_field :second_per_block %>
+  </div>
+  <div class="field">
+    <%= f.label :difficulty_retarget %><br>
+    <%= f.number_field :difficulty_retarget %>
+  </div>
+  <div class="field">
+    <%= f.label :algo %><br>
+    <%= f.text_field :algo %>
+  </div>
+  <div class="field">
+    <%= f.label :block_confirmation %><br>
+    <%= f.number_field :block_confirmation %>
+  </div>
+  <div class="field">
+    <%= f.label :transaction_confirmation %><br>
+    <%= f.number_field :transaction_confirmation %>
+  </div>
+  <div class="field">
+    <%= f.label :rpc_url %><br>
+    <%= f.text_field :rpc_url %>
+  </div>
+  <div class="field">
+    <%= f.label :bitcointalk_url %><br>
+    <%= f.text_field :bitcointalk_url %>
+  </div>
+  <div class="field">
+    <%= f.label :website %><br>
+    <%= f.text_field :website %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

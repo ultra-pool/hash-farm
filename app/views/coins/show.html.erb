@@ -1,0 +1,54 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @coin.name %>
+</p>
+
+<p>
+  <strong>Code:</strong>
+  <%= @coin.code %>
+</p>
+
+<p>
+  <strong>Second per block:</strong>
+  <%= @coin.second_per_block %>
+</p>
+
+<p>
+  <strong>Difficulty retarget:</strong>
+  <%= @coin.difficulty_retarget %>
+</p>
+
+<p>
+  <strong>Algo:</strong>
+  <%= @coin.algo %>
+</p>
+
+<p>
+  <strong>Block confirmation:</strong>
+  <%= @coin.block_confirmation %>
+</p>
+
+<p>
+  <strong>Transaction confirmation:</strong>
+  <%= @coin.transaction_confirmation %>
+</p>
+
+<p>
+  <strong>Rpc url:</strong>
+  <%= @coin.rpc_url %>
+</p>
+
+<p>
+  <strong>Bitcointalk url:</strong>
+  <%= @coin.bitcointalk_url %>
+</p>
+
+<p>
+  <strong>Website:</strong>
+  <%= @coin.website %>
+</p>
+
+<%= link_to 'Edit', edit_coin_path(@coin) %> |
+<%= link_to 'Back', coins_path %>

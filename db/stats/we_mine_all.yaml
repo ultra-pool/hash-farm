@@ -1,0 +1,9 @@
+- :accepted_mh: !ruby/object:Rational
+    denominator: 1
+    numerator: 0
+  :rejected_mh: 0
+  :immature: 0
+  :unexchanged: 0
+  :balance: 0
+  :paid: 0
+  :timestamp: 2014-04-02 16:50:33.165448827 +02:00

@@ -1,0 +1,85 @@
+#! /usr/bin/ruby
+
+require 'socket'
+require 'json'
+
+CONFIG = {
+  "development" => {
+    host: "localhost",
+    port: 13334,
+  },
+  "production" => {
+    host: "localhost",
+    port: 13333,
+  }
+}
+CONFIG["dev"] = CONFIG["development"]
+CONFIG["prod"] = CONFIG["production"]
+
+$config = CONFIG[ ENV["RAILS_ENV"] ] || CONFIG[ "dev" ]
+
+class IO
+  def ready?
+    not IO.select([self], nil, nil, 0) == nil
+  end
+end
+
+def usage
+  s = StringIO.new
+  s.puts "profit_mining [ start | stop | restart | stats | jstats | help ]"
+  s.puts
+  s.puts "Stats and jstats options"
+  s.puts
+  s.puts "profit_mining stats"
+  s.puts "profit_mining stats:users"
+  s.puts "profit_mining stats:pools"
+  s.puts
+  s.puts "jstats return json formated stats."
+  s.string
+end
+
+def start
+  s = TCPSocket.new( $config[:host], $config[:port] ) rescue nil
+  if s.kind_of?( TCPSocket )
+    s.close
+    return puts "profit-mining is already started. Stop it before." 
+  end
+  spawn "rake profit_mining:start"
+end
+
+def stop
+  s = TCPSocket.new( $config[:host], $config[:port] )
+  s.puts( {id: 0, method: "stop"}.to_json )
+  s.close
+rescue
+end
+
+# retrieve command "stats:user:EPIC:106" => ["stats","user","EPIC","106"]
+command = ARGV.shift.split(':')
+
+case command.first
+when "start"
+  start()
+when "stop"
+  stop()
+when "restart"
+  stop()
+  sleep(2)
+  start()
+when "help"
+  puts usage()
+when ""
+  puts usage()
+else
+  s = TCPSocket.new( $config[:host], $config[:port] )
+  s.puts( {id: 0, method: command.join('.')}.to_json )
+  sleep 0.1 while ! s.ready?
+
+  data = ""
+  data += s.read_nonblock( 4096 ) while s.ready?
+  json = JSON.parse(data)
+  result = json["result"] || json["error"]
+  puts result
+
+  s.close
+end

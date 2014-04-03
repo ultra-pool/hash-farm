@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  coin_id: 
+  raw: MyString
+  txid: MyString
+  ourid: MyString
+  block: MyString
+
+two:
+  coin_id: 
+  raw: MyString
+  txid: MyString
+  ourid: MyString
+  block: MyString

@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Transaction:</strong>
+  <%= @payout.transaction %>
+</p>
+
+<p>
+  <strong>Our fees:</strong>
+  <%= @payout.our_fees %>
+</p>
+
+<p>
+  <strong>Users amount:</strong>
+  <%= @payout.users_amount %>
+</p>
+
+<%= link_to 'Edit', edit_payout_path(@payout) %> |
+<%= link_to 'Back', payouts_path %>

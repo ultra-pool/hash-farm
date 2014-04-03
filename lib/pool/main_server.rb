@@ -148,6 +148,7 @@ class MainServer < Stratum::Server
   BALANCE_INTERVAL = 5 * 60 # second
 
   def balance_workers
+    return if self.workers.empty?
     xtrm_balance
   rescue => err
     log.error "Error during workers balance : #{err}\n" + err.backtrace[0..5].join("\n")
@@ -178,8 +179,11 @@ class MainServer < Stratum::Server
       workers_taken_hahrate += res.last
 
       if workers_taken.size + best_pool.workers.size < 1
-        workers_taken = sorted_pools.first.workers.first
-        workers_taken_hahrate = workers_taken.first.hashrate
+        res = get_workers( sorted_pools, MIN_POOL_HASHRATE, 0, 0 )
+        w = res.first.first
+        raise "Là y a un pépin" if w.nil?
+        workers_taken += [w]
+        workers_taken_hahrate += w.hashrate
       end
     end
 

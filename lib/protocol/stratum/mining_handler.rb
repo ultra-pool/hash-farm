@@ -111,7 +111,7 @@ module Stratum
     # Send mining.subscribe request and call given block with response
     def subscribe *args, &block
       @handler.send_request( "mining.subscribe", args.compact ) { |resp|
-        @subscribed = !! resp.result
+        @subscribed = resp.result?
         emit('subscribed', resp.result) if @subscribed
         block.call(resp) if block
       }
@@ -121,7 +121,7 @@ module Stratum
     # Send mining.authorize request and call given block with response
     def authorize name, password, &block
       @handler.send_request( "mining.authorize", [name, password] ) { |resp|
-        @authorized = !! resp.result
+        @authorized = resp.result? && resp.result
         emit('authorized') if @authorized
         block.call(resp) if block
       }

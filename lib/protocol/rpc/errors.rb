@@ -16,6 +16,11 @@ module Rpc
       @message = self.class.name.split('::').last
       @code = code || CODES[@message] || CODES["InternalError"]
       @id = extra.delete(:id)
+      if extra[:exception]
+        @exception = extra.delete(:exception)
+        extra[:message] = @exception.message
+        extra[:backtrace] = @exception.backtrace
+      end
       @extra = extra
     end
 

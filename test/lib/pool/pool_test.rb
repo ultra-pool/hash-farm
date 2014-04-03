@@ -50,11 +50,11 @@ class PoolTest < ActiveSupport::TestCase
     pool = Pool.new("profit_3", profitability: -> { PoolPicker.profitability_of('middlecoin') } )
     t = Time.now
     assert_kind_of Float, pool.profitability
-    assert_operator Time.now - t, :>, 0.5
+    assert_operator Time.now - t, :>, 0.1
     # Recall doesn't recompute, profitability is still valide.
     t = Time.now
     assert_kind_of Float, pool.profitability
-    assert_operator Time.now - t, :<, 0.5
+    assert_operator Time.now - t, :<, 0.01
   end
 
   test "it should compute diff" do skip end

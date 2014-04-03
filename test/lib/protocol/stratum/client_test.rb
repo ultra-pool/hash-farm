@@ -41,7 +41,7 @@ class Stratum::ClientTest < ActiveSupport::TestCase
     sleep( 0.1 )
     req = JSON.parse( @cxn.read_nonblock(4096).chop )
     assert_kind_of Hash, req
-    id = req["id"]
+    id = req["id"] # used up
     @cxn.write( {"id" => id, "result" => true}.to_json + "\n" )
 
     # Assert subscribe block is called

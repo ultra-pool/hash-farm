@@ -95,7 +95,8 @@ module Rpc
     rescue Rpc::Error => err
       send_error err
     rescue JSON::ParserError
-      send_error Rpc::ParseError.new( line: line )
+      id = JSON.parse( '{"id":'+$~[1]+'}' )["id"] if line =~ /"id"\s*:\s*("[^"]*"|\d+)\s*[,}]/
+      send_error Rpc::ParseError.new( line: line, id: id )
     rescue => err
       Handler.log.error "Connection::receive_data : #{err}\n>> line = '#{line}'\n" + err.backtrace.join("\n")
       send_error Rpc::InternalError.new( extra_msg: err.message, backtrace: err.backtrace[0..5] )
@@ -146,21 +147,17 @@ module Rpc
     end
 
     # When receive a valid response, call handler
-    # Return a Rpc::Response (or ErrorResponse)
+    # Return a Rpc::Response
     def receive_response hResp
-      id, result, error = hResp["id"], hResp["result"], hResp["error"]
-      Handler.log.debug "Response received from #{ip_port}##{id} : #{! result.nil? ? result : error}"
-      if error
-        resp = Rpc::ErrorResponse.new( error, id )
-      else
-        resp = Rpc::Response.new( result, id )
-      end
+      resp = Response.factory( hResp )
+      Handler.log.debug "Response received from #{ip_port}##{resp.id} : #{resp.result? ? resp.result : resp.error}"
       emit( 'response', resp )
-      if @response_waited[id]
-        @response_waited.delete(id).call(resp)
-      else
+      if resp.id && @response_waited[resp.id]
+        @response_waited.delete(resp.id).call(resp)
+      elsif resp.result?
         Handler.log.warn "No handler for this response !"
       end
+      resp
     end
 
     ###############################################################################
@@ -198,19 +195,20 @@ module Rpc
       end
     end
 
+    # send_response( aResponse )
+    # send_response( aResult, anId )
+    # send_response( anError [, anId] )
+    # send_response( result: true, id: 2 )
+    # send_response( error: exception, id: 3 )
     # Return Rpc::Response
     def send_response *args
       if args.length == 1 && args.first.kind_of?( Rpc::Response )
         _send_response args.first
-      elsif args.length == 1 && args.first.kind_of?( Rpc::ErrorResponse )
-        _send_error args.first
-      elsif args.length >= 1 && args.first.kind_of?(StandardError)
-        send_error(*args)
       elsif args.length == 1 && args.first.kind_of?( Hash )
-        h = args.first
-        send_response( h["result"], h["id"] )
+        h = OpenStruct.new( args.first )
+        send_response( h.result || h.error, h.id )
       elsif (1..2) === args.length
-        _send_response Rpc::Response.new(*args)
+        _send_response Rpc::Response.factory(*args)
       else
         raise Rpc::ServerError(-1, extra_msg: "in Rpc::Connection.send_response : Wrong number of argument.", args: args)
       end
@@ -219,9 +217,9 @@ module Rpc
     # Return Rpc::ErrorResponse
     def send_error error, id=nil
       if error.kind_of?( Rpc::ErrorResponse )
-        _send_error error
+        _send_response error
       elsif error.kind_of?( Rpc::Error )
-        _send_error Rpc::ErrorResponse.new(error, id)
+        _send_response Rpc::ErrorResponse.new(error, id)
       else
         raise Rpc::ServerError.new(-1, extra_msg: "in Rpc::Connexion.send_error : Wrong type of argument : #{error.class} instead of Rpc::Error")
       end
@@ -232,24 +230,16 @@ module Rpc
       # Return request
       def _send_request request, &block
         @response_waited[request.id] = block if block_given?
-        send_data request
+        send_data request.to_s + "\n"
         request
       end
 
       # resp is an instance of Rpc::Response
       # Return Rpc::Response
       def _send_response resp
-        Handler.log.debug "Sending result : #{resp}"
-        send_data resp
+        Handler.log.debug "Sending response : #{resp}"
+        send_data resp.to_s + "\n"
         resp
-      end
-
-      # error_resp is an instance of Rpc::ErrorResponse
-      # Return Rpc::ErrorResponse
-      def _send_error error_resp
-        Handler.log.debug "Sending error : #{error_resp}"
-        send_data error_resp
-        error_resp
       end
 
     # def puts_error err

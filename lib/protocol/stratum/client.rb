@@ -124,7 +124,7 @@ module Stratum
     def send_data data
       @socket.write_nonblock( data )
     rescue IO::WaitWritable, Errno::EINTR
-      log.info "Fail to send data. Retry in background... (#{data[0...80]})"
+      log.info "Fail to send data. Retry in background... (#{data[0...80]}...)"
       # Retry in background
       Thread.new(data) do |data|
         IO.select(nil, [@socket])

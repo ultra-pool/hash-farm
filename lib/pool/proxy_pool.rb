@@ -76,9 +76,9 @@ class ProxyPool < Pool
   def authentify( callback=nil )
     @proxy.mining.on( 'notify' ) { |job| on_pool_notify( job ) }
     @proxy.mining.on( 'set_difficulty' ) { |diff| on_pool_set_difficulty( diff ) }
-    
+
     @proxy.mining.subscribe( @version, @session_id ) do |resp|
-      if resp.result
+      if resp.result?
         if resp.result[1] != @extra_nonce_1 || resp.result[2] != @extra_nonce_2_size
           @notifications, @extra_nonce_1, @extra_nonce_2_size = *resp.result
           @session_id = @notifications[0][1]
@@ -90,17 +90,17 @@ class ProxyPool < Pool
         end
 
         @proxy.mining.authorize( @username, @password ) do |resp|
-          if resp.result
+          if resp.result? && resp.result
             emit( 'started' )
             callback.call if callback.present?
             log.info( "[#{@host}] Started" )
-          elsif resp.respond_to? :error
-            emit( 'error', "During authorization : #{resp.error}" )
-          else
+          elsif resp.result?
             emit( 'error', "not authorized" )
+          else
+            emit( 'error', "During authorization : #{resp.error}" )
           end
         end
-      elsif resp.respond_to? :error
+      else
         emit( 'error', "During subscription : #{resp.error}" )
       end
     end
@@ -184,7 +184,7 @@ class ProxyPool < Pool
       pool_job = [@username, job_id, extra_nonce_2, ntime, nonce]
       log.debug("Send back pool job : #{pool_job}")
       @proxy.mining.submit( *pool_job ) do |resp|
-        if resp.result
+        if resp.result?
           @accepted_shares += 1
           log.info "#{job_id}/#{share.ident}@#{worker.name} Accepted by pool"
           share.pool_result = true

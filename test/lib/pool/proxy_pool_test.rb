@@ -12,6 +12,7 @@ class ProxyPoolTest < ActiveSupport::TestCase
     get_em_mutex()
     init_dest_pool
     EM.next_tick { @dist_pool.start }
+    sleep(0.1)
   end
 
   teardown do
@@ -46,91 +47,91 @@ class ProxyPoolTest < ActiveSupport::TestCase
     assert stopped
   end
 
-  # test 'it should start and fail on authorize' do
-  #   proxy_pool = ProxyPool.new( "localhost", @port, "wrong_log", "wrong_pass" )
-  #   # proxy_pool.on( 'error' ) do |*params| p params end
+  test 'it should start and fail on authorize' do
+    proxy_pool = ProxyPool.new( "localhost", @port, "wrong_log", "wrong_pass" )
+    # proxy_pool.on( 'error' ) do |*params| p params end
 
-  #   started = stopped = false
-  #   error = false
+    started = stopped = false
+    error = false
 
-  #   proxy_pool.on('error') do error = true end
-  #   proxy_pool.on('started') do started = true end
-  #   proxy_pool.on('stopped') do stopped = true end
+    proxy_pool.on('error') do error = true end
+    proxy_pool.on('started') do started = true end
+    proxy_pool.on('stopped') do stopped = true end
 
-  #   EM.run do proxy_pool.start end
-  #   sleep(0.5)
+    EM.run do proxy_pool.start end
+    sleep(0.5)
 
-  #   EM.run do proxy_pool.stop end
-  #   sleep(0.1)
+    EM.run do proxy_pool.stop end
+    sleep(0.1)
 
-  #   assert error
-  #   refute started
-  #   assert stopped
-  # end
+    assert error
+    refute started
+    assert stopped
+  end
 
-  # test 'it should start correctly' do
-  #   proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
-  #   proxy_pool.on( 'error' ) do |*params| p params end
+  test 'it should start correctly' do
+    proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
+    proxy_pool.on( 'error' ) do |*params| p params end
 
-  #   started = stopped = false
-  #   error = false
+    started = stopped = false
+    error = false
 
-  #   proxy_pool.on('error') do error = true end
-  #   proxy_pool.on('started') do started = true end
-  #   proxy_pool.on('stopped') do stopped = true end
+    proxy_pool.on('error') do error = true end
+    proxy_pool.on('started') do started = true end
+    proxy_pool.on('stopped') do stopped = true end
 
-  #   EM.run do proxy_pool.start end
-  #   sleep(0.5)
+    EM.run do proxy_pool.start end
+    sleep(0.5)
 
-  #   EM.run do proxy_pool.stop end
-  #   sleep(0.1)
+    EM.run do proxy_pool.stop end
+    sleep(0.1)
 
-  #   refute error
-  #   assert started
-  #   assert stopped
-  # end
+    refute error
+    assert started
+    assert stopped
+  end
 
-  # test 'it should received set_difficulty and notify' do
-  #   proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
-  #   proxy_pool.on( 'error' ) do |*params| p params end
+  test 'it should received set_difficulty and notify' do
+    proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
+    proxy_pool.on( 'error' ) do |*params| p params end
 
-  #   proxy_pool.expects( :on_pool_set_difficulty ).once
-  #   proxy_pool.expects( :on_pool_notify ).once
+    proxy_pool.expects( :on_pool_set_difficulty ).once
+    proxy_pool.expects( :on_pool_notify ).once
 
-  #   EM.next_tick do proxy_pool.start end
-  #   sleep(0.5)
+    EM.next_tick do proxy_pool.start end
+    sleep(0.5)
 
-  #   EM.next_tick do proxy_pool.stop end
-  # end
+    EM.next_tick do proxy_pool.stop end
+  end
 
-  # test 'it should not return profitability' do
-  #   proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
-  #   assert_nil proxy_pool.profitability
-  # end
+  test 'it should return default profitability' do
+    proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
+    assert_equal 0.0, proxy_pool.profitability
+  end
 
-  # test 'it should return given profitability' do
-  #   proxy_pool = ProxyPool.new( "localhost", @port, @username, @password, profitability: 0.0042 )
-  #   assert_equal 0.0042, proxy_pool.profitability
-  # end
+  test 'it should return given profitability' do
+    proxy_pool = ProxyPool.new( "localhost", @port, @username, @password, profitability: 0.0042 )
+    assert_equal 0.0042, proxy_pool.profitability
+  end
 
-  # test 'it should return given callable profitability' do
-  #   proxy_pool = ProxyPool.new( "localhost", @port, @username, @password, profitability: -> { 0.00314 } )
-  #   assert_equal 0.00314, proxy_pool.profitability
-  # end
+  test 'it should return given callable profitability' do
+    proxy_pool = ProxyPool.new( "localhost", @port, @username, @password, profitability: -> { 0.00314 } )
+    assert_equal 0.00314, proxy_pool.profitability
+  end
 
-  # test 'it should retrieve profitability on the website' do
-  #   profitability = {
-  #     profitability_url: "http://coinshift.com//",
-  #     profitability_path: ".panel-heading:contains('24h') + .stats-box h1",
-  #   }
-  #   proxy_pool = ProxyPool.new( "localhost", @port, @username, @password, profitability )
-  #   assert_kind_of Float, proxy_pool.profitability
-  # end
+  test 'it should retrieve profitability on the website' do
+    profitability = {
+      profitability_url: "http://coinshift.com//",
+      profitability_path: ".panel-heading:contains('24h') + .stats-box h1",
+    }
+    proxy_pool = ProxyPool.new( "localhost", @port, @username, @password, profitability )
+    assert_kind_of Float, proxy_pool.profitability
+  end
 
-  # test "it should compute diff" do skip end
-  # test "it should subscribe" do skip end
-  # test "it should submit dist pool share" do skip end
-  # test "it should clean_previous_jobs" do skip end
+  test "it should compute diff" do skip end
+  test "it should subscribe" do skip end
+  test "it should submit dist pool share" do skip end
+  test "it should clean_previous_jobs" do skip end
 
   ######################################
 
@@ -144,7 +145,7 @@ class ProxyPoolTest < ActiveSupport::TestCase
       if req.params.empty?
         req.respond [["uuid_1", "mining.notify", "uuid_2", "mining.set_difficulty"], "f0f01f1f", 4]
       else
-        req.error Rpc::InvalidParams.new(extra_msg: "Unknow param")
+        req.error Rpc::InvalidParams.new(extra_msg: "Unknow param", id: req.id)
       end
     end
     @dist_pool.on('mining.authorize') do |cxn, req|

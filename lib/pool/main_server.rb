@@ -25,6 +25,7 @@ class MainServer < Stratum::Server
     @pools = []
     @balance = false
     @disconnected_workers = {}
+    @min_pool_hashrate = ProfitMining.config.min_pool_hashrate
 
     init_event_machine
     init_pools
@@ -39,6 +40,8 @@ class MainServer < Stratum::Server
           log.error( "#{name} : #{error}" )
           emit( 'error', name, error )
         end
+        pool.on( 'empty' ) do fill_holes end
+        pool.on( 'low_hashrate' ) do fill_holes end
         pool
       rescue => err
         # TODO: ressayer plus tard ou sur le backup quand il y a un pb
@@ -141,68 +144,90 @@ class MainServer < Stratum::Server
   def choose_pool_for_new_worker
     sorted_pools = @pools.sort_by { |p| p.profitability || 0.0 }.reverse
     sorted_pools.find { |p| p.workers.empty? } ||
-    sorted_pools.find { |p| p.hashrate < MIN_POOL_HASHRATE } ||
+    sorted_pools.find { |p| p.hashrate < @min_pool_hashrate } ||
     sorted_pools.first
   end
 
-  BALANCE_INTERVAL = 5 * 60 # second
+  BALANCE_INTERVAL = 15 * 60 # second
 
   def balance_workers
-    return if self.workers.empty?
+    return if self.workers.empty? || @pools.size <= 1
+    fill_holes
     xtrm_balance
   rescue => err
     log.error "Error during workers balance : #{err}\n" + err.backtrace[0..5].join("\n")
   end
 
-  XTRM_BALANCE_RATIO = 0.25 # %
-  MIN_POOL_HASHRATE = 2.0 * 10**6 # Minimun Mhs per pool
+  # Try to have min_hashrate in each pools, or at least one worker.
+  # Complete more profitable pools first.
+  def fill_holes( pools=@pools, min_hashrate=@min_pool_hashrate )
+    sorted_pools = pools.sort_by(&:profitability)
 
-  def xtrm_balance
-    sorted_pools = @pools.sort_by { |p| p.profitability || 0.0 }
-    best_index = -1
-    # best_index = sorted_pools.find_index { |p| p.workers.empty? }
-    best_pool = sorted_pools.delete_at(best_index)
-    return if sorted_pools.empty?
-    
-    to_take = self.hashrate * XTRM_BALANCE_RATIO
-    workers_taken = []
-    workers_taken_hahrate = 0.0
+    # Balance each pool to have min_hashrate or at least 1 worker
+    sorted_pools.each_with_index do |pool, i|
+      begin
+        next unless pool.workers.empty? || pool.hashrate < min_hashrate
+        log.verbose "fill_holes : #{pool.name} has %.1f MH/s and %d workers. We want to take %.1f Mhps" % [pool.hashrate * 10**-6, pool.workers.size, min_hashrate / 10**6]
+        res = get_workers( sorted_pools[0..i], min_hashrate - pool.hashrate )
+        res.first.each do |w| w.pool = pool end
 
-    log.info "xtrm_balance : best pool is #{best_pool.name}, we want to take %.2f Mhps" % (to_take / 10**6)
+        next unless pool.workers.empty? || pool.hashrate < min_hashrate
+        log.verbose "fill_holes : #{pool.name} has %.1f MH/s and %d workers. We want to take %.1f Mhps" % [pool.hashrate * 10**-6, pool.workers.size, min_hashrate / 10**6] unless res.first.empty?
+        res = get_workers( sorted_pools[i+1..-1], min_hashrate - pool.hashrate )
+        res.first.each do |w| w.pool = pool end
 
-    workers_taken, workers_taken_hahrate = *get_workers( sorted_pools, to_take )
-    
-    # Si best_pool.hashrate < à MIN_POOL_HASHRATE, on force.
-    if workers_taken_hahrate + best_pool.hashrate < MIN_POOL_HASHRATE
-      res = get_workers( sorted_pools, to_take - workers_taken_hahrate, 0 )
-      workers_taken += res.first
-      workers_taken_hahrate += res.last
+        next unless pool.workers.empty? || pool.hashrate < min_hashrate
+        log.verbose "fill_holes : #{pool.name} has %.1f MH/s and %d workers. We want to take %.1f Mhps" % [pool.hashrate * 10**-6, pool.workers.size, min_hashrate / 10**6] unless res.first.empty?
+        res = get_workers( sorted_pools[0...i], min_hashrate - pool.hashrate, 0 ) # leave one worker
+        res.first.each do |w| w.pool = pool end
 
-      if workers_taken.size + best_pool.workers.size < 1
-        res = get_workers( sorted_pools, MIN_POOL_HASHRATE, 0, 0 )
-        w = res.first.first
-        raise "Là y a un pépin" if w.nil?
-        workers_taken += [w]
-        workers_taken_hahrate += w.hashrate
+        next unless pool.workers.empty?
+        log.verbose "fill_holes : #{pool.name} has %.1f MH/s and %d workers. We want to take 1 worker" % [pool.hashrate * 10**-6, pool.workers.size] unless res.first.empty?
+        res = get_workers( sorted_pools[i+1..-1], min_hashrate - pool.hashrate, 0 )
+        res.first.first.pool = pool if res.first.size > 0
+
+        next unless pool.workers.empty?
+        log.verbose "fill_holes : #{pool.name} has %.1f MH/s and %d workers. We want to take 1 worker" % [pool.hashrate * 10**-6, pool.workers.size] unless res.first.empty?
+        res = get_workers( sorted_pools[0...i], min_hashrate - pool.hashrate, 0, 0 )
+        res.first.first.pool = pool if res.first.size > 0
+
+      rescue => err
+        log.error "Error during xtrm_balance : #{err}\n" + err.backtrace[0..5].join("\n")
+      ensure
+        log.info "fill_holes : #{pool.name} has now %.1f MH/s and %d workers." % [pool.hashrate * 10**-6, pool.workers.size]
       end
     end
 
-    workers_taken.each { |w| w.pool = best_pool }
-    log.info "%.2f Mh/s added to #{best_pool.name}." % (workers_taken_hahrate / 10**6)
+    self
+  end
+
+  XTRM_BALANCE_RATIO = 0.25 # %
+
+  def xtrm_balance
+    sorted_pools = @pools.sort_by(&:profitability)
+
+    best_pool = sorted_pools[-1]
+    to_take = self.hashrate * XTRM_BALANCE_RATIO
+    log.info "xtrm_balance : best pool is #{best_pool.name}, we want to take %.2f Mhps" % (to_take / 10**6)
+    res = get_workers( sorted_pools[0...-1], to_take )
+    res.first.each do |w| w.pool = best_pool end
+
+    log.info "%.2f Mh/s added to #{best_pool.name}." % (res.last / 10**6)
+    res
   rescue => err
     log.error "Error during xtrm_balance : #{err}\n" + err.backtrace[0..5].join("\n")
   end
 
-  def get_workers( sorted_pools, hashrate_to_take, min_hashrate_to_leave=MIN_POOL_HASHRATE, min_workers_to_leave=1 )
+  def get_workers( sorted_pools, hashrate_to_take, min_hashrate_to_leave=@min_pool_hashrate, min_workers_to_leave=1 )
     workers_taken = []
     hahrate_taken = 0
 
     for pool in sorted_pools
-      log.info "for #{pool.name}, there are #{pool.workers.size} workers for %.2f Mhps" % (pool.hashrate.to_f / 10**6)
+      log.verbose "for #{pool.name}, there are #{pool.workers.size} workers for %.2f Mhps" % (pool.hashrate.to_f / 10**6)
       pool_workers_taken, pool_hahrate_taken = get_workers_from( pool, hashrate_to_take - hahrate_taken,
         min_hashrate_to_leave, min_workers_to_leave )
 
-      log.info "Retrieve %.2f Mh/s from #{pool.name}." % (pool_hahrate_taken * 10**-6)
+      log.info "Retrieve %.2f Mh/s from #{pool.name}." % (pool_hahrate_taken * 10**-6) unless pool_workers_taken.empty?
       workers_taken += pool_workers_taken
       hahrate_taken += pool_hahrate_taken
 
@@ -213,7 +238,7 @@ class MainServer < Stratum::Server
   end
 
   # => ary of Worker
-  def get_workers_from( pool, hashrate_to_take, min_hashrate_to_leave=MIN_POOL_HASHRATE, min_workers_to_leave=1 )
+  def get_workers_from( pool, hashrate_to_take, min_hashrate_to_leave=@min_pool_hashrate, min_workers_to_leave=1 )
     return [ [], 0.0 ] if pool.workers.size <= min_workers_to_leave
     return [pool.workers, pool.hashrate] if pool.workers.size == 1 && min_workers_to_leave == 0 && min_hashrate_to_leave == 0
 

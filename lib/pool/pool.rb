@@ -139,7 +139,8 @@ class Pool
     return unless nb_share < 5 || nb_share % 5 == 0
     diff = compute_diff( worker )
     Pool.log.debug "`adjust_diff' for #{@name} with #{worker.hashrate/1000}kh => #{diff}"
-    worker.next_difficulty = diff  end
+    worker.next_difficulty = diff
+  end
 
   def compute_diff worker
     worker_hashrate = worker.hashrate.to_f
@@ -155,6 +156,12 @@ class Pool
     worker.off( self, 'disconnect' )
     worker.off( self, 'pool_changed' )
     update_desired_share_rate_per_worker
+
+    if @workers.size == 0
+      emit( "empty" )
+    elsif self.hashrate < ProfitMining.config.min_pool_hashrate
+      emit( "low_hashrate" )
+    end
   end
 
   # If keep_last_one is false, remove all jobs before last clean_jobs

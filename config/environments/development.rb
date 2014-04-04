@@ -40,4 +40,6 @@ ProfitMining::Application.configure do
   config.command_server = OpenStruct.new
   config.command_server.host = "localhost"
   config.command_server.port = 13334
+  
+  config.min_pool_hashrate = 2.0 * 10**6 # Minimun Mhs per pool
 end

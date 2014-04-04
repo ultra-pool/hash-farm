@@ -1027,3 +1027,927 @@
   :balance: 0.00809024
   :paid: 0.33651038
   :timestamp: 2014-04-03 18:26:45.178724397 +02:00
+- :accepted_mh: 2.2916
+  :rejected_mh: 0.1747
+  :immature: 0.0
+  :unexchanged: 0.00509501
+  :balance: 0.00809024
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 18:41:39.429162832 +02:00
+- :accepted_mh: 2.2916
+  :rejected_mh: 0.1747
+  :immature: 0.0
+  :unexchanged: 0.00509501
+  :balance: 0.00809024
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 18:41:45.256114717 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.0582
+  :immature: 0.0
+  :unexchanged: 0.00505164
+  :balance: 0.00811688
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 18:56:39.507094665 +02:00
+- :accepted_mh: 3.672
+  :rejected_mh: 0.0582
+  :immature: 0.0
+  :unexchanged: 0.00556671
+  :balance: 0.00820278
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 19:11:39.713075927 +02:00
+- :accepted_mh: 3.7199
+  :rejected_mh: 0.1062
+  :immature: 0.0
+  :unexchanged: 0.00589038
+  :balance: 0.00823287
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 19:26:39.692707420 +02:00
+- :accepted_mh: 4.4666999999999994
+  :rejected_mh: 0.048
+  :immature: 0.0
+  :unexchanged: 0.00602383
+  :balance: 0.00823287
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 19:41:39.583089726 +02:00
+- :accepted_mh: 4.4666999999999994
+  :rejected_mh: 0.048
+  :immature: 0.0
+  :unexchanged: 0.00602383
+  :balance: 0.00823287
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 19:41:46.888529639 +02:00
+- :accepted_mh: 6.08
+  :rejected_mh: 0.048
+  :immature: 0.0
+  :unexchanged: 0.00604652
+  :balance: 0.00827216
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 19:56:39.707723124 +02:00
+- :accepted_mh: 6.08
+  :rejected_mh: 0.048
+  :immature: 0.0
+  :unexchanged: 0.00604652
+  :balance: 0.00827216
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 19:56:46.976976537 +02:00
+- :accepted_mh: 4.8469
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00614308
+  :balance: 0.00827216
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:11:39.738165550 +02:00
+- :accepted_mh: 4.8469
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00614308
+  :balance: 0.00827216
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:11:46.772401356 +02:00
+- :accepted_mh: 5.3641000000000005
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00669224
+  :balance: 0.00827216
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:26:39.780039658 +02:00
+- :accepted_mh: 5.3641000000000005
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00669224
+  :balance: 0.00827216
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:26:47.098561911 +02:00
+- :accepted_mh: 5.3915
+  :rejected_mh: 0.35969999999999996
+  :immature: 0.0
+  :unexchanged: 0.00642849
+  :balance: 0.00869489
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:41:39.728357766 +02:00
+- :accepted_mh: 5.3915
+  :rejected_mh: 0.35969999999999996
+  :immature: 0.0
+  :unexchanged: 0.00642849
+  :balance: 0.00869489
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:41:46.889278650 +02:00
+- :accepted_mh: 2.9972
+  :rejected_mh: 0.2398
+  :immature: 0.0
+  :unexchanged: 0.00655418
+  :balance: 0.00869489
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:56:39.753058872 +02:00
+- :accepted_mh: 2.9972
+  :rejected_mh: 0.2398
+  :immature: 0.0
+  :unexchanged: 0.00655418
+  :balance: 0.00869489
+  :paid: 0.33651038
+  :timestamp: 2014-04-03 20:56:46.166478965 +02:00
+- :accepted_mh: 1.9422000000000001
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00699745
+  :balance: 0.0
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:11:39.380204391 +02:00
+- :accepted_mh: 1.9422000000000001
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00699745
+  :balance: 0.0
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:11:47.130789623 +02:00
+- :accepted_mh: 1.5928
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00704406
+  :balance: 0.0
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:26:40.166307721 +02:00
+- :accepted_mh: 1.5928
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00704406
+  :balance: 0.0
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:26:47.136127032 +02:00
+- :accepted_mh: 1.6647
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0073717
+  :balance: 0.0
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:41:38.804851566 +02:00
+- :accepted_mh: 1.6647
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0073717
+  :balance: 0.0
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:41:47.030713675 +02:00
+- :accepted_mh: 2.2196
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00697593
+  :balance: 0.00061201
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:56:38.900173282 +02:00
+- :accepted_mh: 2.2196
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00697593
+  :balance: 0.00061201
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 21:56:46.929875078 +02:00
+- :accepted_mh: 1.836
+  :rejected_mh: 0.0343
+  :immature: 0.0
+  :unexchanged: 0.00700334
+  :balance: 0.0006197
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:11:39.835267296 +02:00
+- :accepted_mh: 1.836
+  :rejected_mh: 0.0343
+  :immature: 0.0
+  :unexchanged: 0.00700334
+  :balance: 0.0006197
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:11:47.187263757 +02:00
+- :accepted_mh: 2.021
+  :rejected_mh: 0.0343
+  :immature: 0.0
+  :unexchanged: 0.00675568
+  :balance: 0.00101696
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:26:39.474869862 +02:00
+- :accepted_mh: 2.021
+  :rejected_mh: 0.0343
+  :immature: 0.0
+  :unexchanged: 0.00675568
+  :balance: 0.00101696
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:26:46.936931977 +02:00
+- :accepted_mh: 2.1237
+  :rejected_mh: 0.0343
+  :immature: 0.0
+  :unexchanged: 0.00677351
+  :balance: 0.00103459
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:41:39.176305104 +02:00
+- :accepted_mh: 2.1237
+  :rejected_mh: 0.0343
+  :immature: 0.0
+  :unexchanged: 0.00677351
+  :balance: 0.00103459
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:41:46.771547911 +02:00
+- :accepted_mh: 2.0551999999999997
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0062174
+  :balance: 0.00168007
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:56:38.821660623 +02:00
+- :accepted_mh: 2.0551999999999997
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0062174
+  :balance: 0.00168007
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 22:56:47.080205774 +02:00
+- :accepted_mh: 2.1854
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00627499
+  :balance: 0.00168635
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:11:39.413108583 +02:00
+- :accepted_mh: 2.1854
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00627499
+  :balance: 0.00168635
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:11:46.190249619 +02:00
+- :accepted_mh: 2.0484
+  :rejected_mh: 0.048
+  :immature: 0.0
+  :unexchanged: 0.00647685
+  :balance: 0.00170875
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:26:38.951523553 +02:00
+- :accepted_mh: 2.0484
+  :rejected_mh: 0.048
+  :immature: 0.0
+  :unexchanged: 0.00647685
+  :balance: 0.00170875
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:26:46.767649327 +02:00
+- :accepted_mh: 1.3599
+  :rejected_mh: 0.0171
+  :immature: 0.0
+  :unexchanged: 0.00618603
+  :balance: 0.00210197
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:41:39.531656715 +02:00
+- :accepted_mh: 1.3599
+  :rejected_mh: 0.0171
+  :immature: 0.0
+  :unexchanged: 0.00618603
+  :balance: 0.00210197
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:41:46.197865077 +02:00
+- :accepted_mh: 3.6069
+  :rejected_mh: 0.0582
+  :immature: 0.0
+  :unexchanged: 0.00565328
+  :balance: 0.00265981
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:56:40.597219516 +02:00
+- :accepted_mh: 3.6069
+  :rejected_mh: 0.0582
+  :immature: 0.0
+  :unexchanged: 0.00565328
+  :balance: 0.00265981
+  :paid: 0.20774986
+  :timestamp: 2014-04-03 23:56:47.627211485 +02:00
+- :accepted_mh: 4.0693
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00571323
+  :balance: 0.00269513
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:11:39.234066007 +02:00
+- :accepted_mh: 4.0693
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00571323
+  :balance: 0.00269513
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:11:46.167868448 +02:00
+- :accepted_mh: 5.1791
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00543471
+  :balance: 0.00330537
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:26:38.922159253 +02:00
+- :accepted_mh: 5.1791
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00543471
+  :balance: 0.00330537
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:26:46.900714768 +02:00
+- :accepted_mh: 5.158600000000001
+  :rejected_mh: 0.0993
+  :immature: 0.0
+  :unexchanged: 0.00554857
+  :balance: 0.00330953
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:41:40.004407465 +02:00
+- :accepted_mh: 5.158600000000001
+  :rejected_mh: 0.0993
+  :immature: 0.0
+  :unexchanged: 0.00554857
+  :balance: 0.00330953
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:41:46.971873587 +02:00
+- :accepted_mh: 4.5694
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00600091
+  :balance: 0.00350366
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:56:39.057240567 +02:00
+- :accepted_mh: 4.5694
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00600091
+  :balance: 0.00350366
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 00:56:46.949326514 +02:00
+- :accepted_mh: 2.8156
+  :rejected_mh: 0.0993
+  :immature: 0.0
+  :unexchanged: 0.00611726
+  :balance: 0.00350416
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:11:39.125354991 +02:00
+- :accepted_mh: 2.8156
+  :rejected_mh: 0.0993
+  :immature: 0.0
+  :unexchanged: 0.00611726
+  :balance: 0.00350416
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:11:46.175628130 +02:00
+- :accepted_mh: 3.9426
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00613364
+  :balance: 0.00350796
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:26:40.019410612 +02:00
+- :accepted_mh: 3.9426
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00613364
+  :balance: 0.00350796
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:26:46.775451451 +02:00
+- :accepted_mh: 2.5622
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00619618
+  :balance: 0.00350796
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:41:39.552924410 +02:00
+- :accepted_mh: 2.5622
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00619618
+  :balance: 0.00350796
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:41:47.569494566 +02:00
+- :accepted_mh: 3.0143
+  :rejected_mh: 0.07540000000000001
+  :immature: 0.0
+  :unexchanged: 0.00583704
+  :balance: 0.00405743
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:56:39.597219788 +02:00
+- :accepted_mh: 3.0143
+  :rejected_mh: 0.07540000000000001
+  :immature: 0.0
+  :unexchanged: 0.00583704
+  :balance: 0.00405743
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 01:56:46.949362794 +02:00
+- :accepted_mh: 4.2954
+  :rejected_mh: 0.07540000000000001
+  :immature: 0.0
+  :unexchanged: 0.00619148
+  :balance: 0.00405743
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:11:39.820203564 +02:00
+- :accepted_mh: 4.2954
+  :rejected_mh: 0.07540000000000001
+  :immature: 0.0
+  :unexchanged: 0.00619148
+  :balance: 0.00405743
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:11:46.170361336 +02:00
+- :accepted_mh: 5.6724
+  :rejected_mh: 0.1507
+  :immature: 0.0
+  :unexchanged: 0.00656251
+  :balance: 0.00413611
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:26:39.006381886 +02:00
+- :accepted_mh: 5.6724
+  :rejected_mh: 0.1507
+  :immature: 0.0
+  :unexchanged: 0.00656251
+  :balance: 0.00413611
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:26:46.179583105 +02:00
+- :accepted_mh: 6.2787
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00657699
+  :balance: 0.00413611
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:41:38.914293795 +02:00
+- :accepted_mh: 6.2787
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00657699
+  :balance: 0.00413611
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:41:47.932432990 +02:00
+- :accepted_mh: 3.2060999999999997
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.006231
+  :balance: 0.00460255
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:56:39.858772892 +02:00
+- :accepted_mh: 3.2060999999999997
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.006231
+  :balance: 0.00460255
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 02:56:47.030195068 +02:00
+- :accepted_mh: 0.1336
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00655239
+  :balance: 0.00489023
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:11:39.051257399 +02:00
+- :accepted_mh: 0.1336
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00655239
+  :balance: 0.00489023
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:11:47.039745971 +02:00
+- :accepted_mh: 0.0
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060238
+  :balance: 0.00557802
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:26:39.625744498 +02:00
+- :accepted_mh: 0.0
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060238
+  :balance: 0.00557802
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:26:46.877002551 +02:00
+- :accepted_mh: 0.0
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060441
+  :balance: 0.00557802
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:41:39.803479566 +02:00
+- :accepted_mh: 0.0
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060441
+  :balance: 0.00557802
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:41:46.855869086 +02:00
+- :accepted_mh: 1.031
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00602349
+  :balance: 0.00564768
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:56:39.683188247 +02:00
+- :accepted_mh: 1.031
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00602349
+  :balance: 0.00564768
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 03:56:46.979528293 +02:00
+- :accepted_mh: 2.617
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00572643
+  :balance: 0.00597411
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:11:39.099375216 +02:00
+- :accepted_mh: 2.617
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00572643
+  :balance: 0.00597411
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:11:46.189488525 +02:00
+- :accepted_mh: 3.076
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00584886
+  :balance: 0.00600245
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:26:39.800091430 +02:00
+- :accepted_mh: 3.076
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00584886
+  :balance: 0.00600245
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:26:46.966977613 +02:00
+- :accepted_mh: 2.408
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00621772
+  :balance: 0.00600245
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:41:39.755378013 +02:00
+- :accepted_mh: 2.408
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00621772
+  :balance: 0.00600245
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:41:46.181055848 +02:00
+- :accepted_mh: 2.3635
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00613405
+  :balance: 0.00612756
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:56:39.881612877 +02:00
+- :accepted_mh: 2.3635
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00613405
+  :balance: 0.00612756
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 04:56:46.953767990 +02:00
+- :accepted_mh: 2.3121
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0061211
+  :balance: 0.00642862
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:11:39.583916068 +02:00
+- :accepted_mh: 2.3121
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0061211
+  :balance: 0.00642862
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:11:47.076841985 +02:00
+- :accepted_mh: 2.158
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060508
+  :balance: 0.00661062
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:26:39.673784218 +02:00
+- :accepted_mh: 2.158
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060508
+  :balance: 0.00661062
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:26:46.187802921 +02:00
+- :accepted_mh: 2.0038
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060331
+  :balance: 0.00661756
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:41:39.421662757 +02:00
+- :accepted_mh: 2.0038
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0060331
+  :balance: 0.00661756
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:41:46.194809168 +02:00
+- :accepted_mh: 2.3635
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0055491
+  :balance: 0.00714213
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:56:39.070072395 +02:00
+- :accepted_mh: 2.3635
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0055491
+  :balance: 0.00714213
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 05:56:47.035780913 +02:00
+- :accepted_mh: 2.2607
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00558043
+  :balance: 0.00714213
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:11:39.126342634 +02:00
+- :accepted_mh: 2.2607
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00558043
+  :balance: 0.00714213
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:11:47.030198191 +02:00
+- :accepted_mh: 2.6718
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.0052684
+  :balance: 0.007472
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:26:39.039082407 +02:00
+- :accepted_mh: 2.6718
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.0052684
+  :balance: 0.007472
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:26:46.798357151 +02:00
+- :accepted_mh: 2.7232
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00529269
+  :balance: 0.007472
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:41:39.081128520 +02:00
+- :accepted_mh: 2.7232
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00529269
+  :balance: 0.007472
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:41:46.207369096 +02:00
+- :accepted_mh: 2.2607
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00528158
+  :balance: 0.00750473
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:56:39.062059650 +02:00
+- :accepted_mh: 2.2607
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00528158
+  :balance: 0.00750473
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 06:56:46.286484682 +02:00
+- :accepted_mh: 2.2607
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00531121
+  :balance: 0.00750636
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:11:39.153383794 +02:00
+- :accepted_mh: 2.2607
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00531121
+  :balance: 0.00750636
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:11:46.186776285 +02:00
+- :accepted_mh: 2.3635
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00535159
+  :balance: 0.00750777
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:26:39.282091981 +02:00
+- :accepted_mh: 2.3635
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00535159
+  :balance: 0.00750777
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:26:46.876899621 +02:00
+- :accepted_mh: 2.7232
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00538055
+  :balance: 0.00750777
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:41:39.866499612 +02:00
+- :accepted_mh: 2.7232
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00538055
+  :balance: 0.00750777
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:41:46.187744775 +02:00
+- :accepted_mh: 2.0551999999999997
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00436953
+  :balance: 0.00875917
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:56:39.679679260 +02:00
+- :accepted_mh: 2.0551999999999997
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00436953
+  :balance: 0.00875917
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 07:56:46.866924578 +02:00
+- :accepted_mh: 2.5176
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00464041
+  :balance: 0.00877064
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:11:39.751012380 +02:00
+- :accepted_mh: 2.5176
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00464041
+  :balance: 0.00877064
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:11:46.182772024 +02:00
+- :accepted_mh: 2.9286999999999996
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00452968
+  :balance: 0.0088845
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:26:39.183657119 +02:00
+- :accepted_mh: 2.9286999999999996
+  :rejected_mh: 0.0514
+  :immature: 0.0
+  :unexchanged: 0.00452968
+  :balance: 0.0088845
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:26:46.202279642 +02:00
+- :accepted_mh: 2.8122
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00455145
+  :balance: 0.0088845
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:41:39.688708430 +02:00
+- :accepted_mh: 2.8122
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00455145
+  :balance: 0.0088845
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:41:46.297138593 +02:00
+- :accepted_mh: 2.7676999999999996
+  :rejected_mh: 0.0685
+  :immature: 0.0
+  :unexchanged: 0.00335927
+  :balance: 0.01041301
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:56:39.808741094 +02:00
+- :accepted_mh: 2.7676999999999996
+  :rejected_mh: 0.0685
+  :immature: 0.0
+  :unexchanged: 0.00335927
+  :balance: 0.01041301
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 08:56:47.062737411 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.12329999999999999
+  :immature: 0.0
+  :unexchanged: 0.00342767
+  :balance: 0.01041301
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:11:39.778662281 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.12329999999999999
+  :immature: 0.0
+  :unexchanged: 0.00342767
+  :balance: 0.01041301
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:11:46.252885686 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.10959999999999999
+  :immature: 0.0
+  :unexchanged: 0.00342179
+  :balance: 0.01055368
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:26:40.075659399 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.10959999999999999
+  :immature: 0.0
+  :unexchanged: 0.00342179
+  :balance: 0.01055368
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:26:47.159484424 +02:00
+- :accepted_mh: 2.8499
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00343169
+  :balance: 0.01055802
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:41:39.269745674 +02:00
+- :accepted_mh: 2.8499
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00343169
+  :balance: 0.01055802
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:41:46.902887042 +02:00
+- :accepted_mh: 2.3018
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00345307
+  :balance: 0.01111159
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:56:39.396431956 +02:00
+- :accepted_mh: 2.3018
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00345307
+  :balance: 0.01111159
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 09:56:47.677742534 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.21919999999999998
+  :immature: 0.0
+  :unexchanged: 0.00396913
+  :balance: 0.01111159
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:11:46.492762128 +02:00
+- :accepted_mh: 2.5759000000000003
+  :rejected_mh: 0.21919999999999998
+  :immature: 0.0
+  :unexchanged: 0.00396913
+  :balance: 0.01111159
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:11:54.073651729 +02:00
+- :accepted_mh: 2.247
+  :rejected_mh: 0.5481
+  :immature: 0.0
+  :unexchanged: 0.00383462
+  :balance: 0.01131085
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:26:39.170869483 +02:00
+- :accepted_mh: 2.247
+  :rejected_mh: 0.5481
+  :immature: 0.0
+  :unexchanged: 0.00383462
+  :balance: 0.01131085
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:26:46.895993263 +02:00
+- :accepted_mh: 2.0278
+  :rejected_mh: 0.10959999999999999
+  :immature: 0.0
+  :unexchanged: 0.00344581
+  :balance: 0.01180464
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:41:39.574850416 +02:00
+- :accepted_mh: 2.0278
+  :rejected_mh: 0.10959999999999999
+  :immature: 0.0
+  :unexchanged: 0.00344581
+  :balance: 0.01180464
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:41:46.264827891 +02:00
+- :accepted_mh: 4.107
+  :rejected_mh: 0.0856
+  :immature: 0.0
+  :unexchanged: 0.00367731
+  :balance: 0.01181816
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 10:56:40.311323911 +02:00
+- :accepted_mh: 4.727
+  :rejected_mh: 0.21919999999999998
+  :immature: 0.0
+  :unexchanged: 0.00367658
+  :balance: 0.01181816
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 11:11:40.714293776 +02:00
+- :accepted_mh: 5.1072
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00374272
+  :balance: 0.01181816
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 11:26:40.307506614 +02:00
+- :accepted_mh: 6.3198
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.00363442
+  :balance: 0.01195921
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 11:41:40.242326208 +02:00
+- :accepted_mh: 5.001
+  :rejected_mh: 0.0
+  :immature: 0.0
+  :unexchanged: 0.0036186
+  :balance: 0.01197268
+  :paid: 0.20774986
+  :timestamp: 2014-04-04 11:56:40.302347075 +02:00

@@ -28,25 +28,34 @@ USAGE
   # with a method, a lambda or a proc,
   #   listenableObj.on( signal, -> { |msg| log(msg) } )
   #   listenableObj.on( signal, myObj.method(:callback) )
-  # or with an object and a method to call on this object.
+  # or with an object and a method name to call on this object.
   #   listenableObj.on( signal, myObj, :callback )
+  # => a callback_id
   def on(signal, *args, &block)
     @listenable ||= {}
     @listenable[signal] ||= []
-    @listenable[signal] << listener_callback(*args, &block)
+    cb = listener_callback(*args, &block)
+    @listenable[signal] << cb
+    id = "#{signal}:#{cb.object_id}"
   end
 
-  # obj.unbind(self)
-  # obj.unbind(self, 'signal')
+  # obj.unbind( callback_id )
+  # obj.unbind( self, 'signal' )
+  # obj.unbind( self )
   def off(obj, signal=nil)
-    if signal
-      signals = [signal]
-    else
-      signals = @listenable.keys
-    end
-    signals.each do |s|
-      @listenable[s].delete_if do |callback|
+    if obj.kind_of?( String )
+      signal, cb_id = obj.split(':')
+      @listenable[signal].delete_if do |cb| cb.object_id == cb_id end
+      signals = []
+    elsif signal
+      @listenable[signal].delete_if do |callback|
         callback.binding.eval("self") == obj
+      end
+    else
+      @listenable.keys.each do |signal|
+        @listenable[signal].delete_if do |callback|
+          callback.binding.eval("self") == obj
+        end
       end
     end
   end

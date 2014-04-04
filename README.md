@@ -28,3 +28,4 @@ In config/environments/, you can configure :
 
 - server listening port (default: 3333)
 - multicoin pools to watch (default: all)
+

@@ -5,7 +5,7 @@ require 'listenable'
 
 require_relative './job'
 
-using CoreExtensions
+# using CoreExtensions
 
 #
 # class Stratum::Mining

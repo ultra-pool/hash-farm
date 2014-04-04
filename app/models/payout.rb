@@ -3,7 +3,7 @@
 require 'core_extensions'
 require 'loggable'
 
-using CoreExtensions
+# using CoreExtensions
 
 class Payout < ActiveRecord::Base
   include Loggable

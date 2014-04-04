@@ -9,7 +9,7 @@ require "multicoin_pool"
 require_relative './pool'
 require_relative './worker_connection'
 
-using CoreExtensions
+# using CoreExtensions
 
 #
 # The ProxyPool connect to an other distant pool.

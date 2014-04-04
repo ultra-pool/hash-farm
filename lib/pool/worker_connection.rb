@@ -3,7 +3,7 @@
 require 'core_extensions'
 require "protocol/stratum"
 
-using CoreExtensions
+# using CoreExtensions
 
 # Signals :
 # - pool_changed(old_pool, new_pool)

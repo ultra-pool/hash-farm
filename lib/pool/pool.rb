@@ -6,7 +6,7 @@ require 'core_extensions'
 
 require 'protocol/stratum/submit'
 
-using CoreExtensions
+# using CoreExtensions
 
 # La pool à un ensemble de connection @worker_connections
 class Pool

@@ -5,12 +5,12 @@ require "protocol/stratum/job"
 require "protocol/stratum/submit"
 require "core/share_tool"
 
-using CoreExtensions
+# using CoreExtensions
 
 class ShareTest < ActiveSupport::TestCase
 
   setup do
-    # Block #396506
+    # Litecoin Block #396506
     @version       = 2
     @previous_hash = "391e4170f227b00db87b381b351d9371794aa629b092732298717111c271124c"
     @ntime         = 1374999143

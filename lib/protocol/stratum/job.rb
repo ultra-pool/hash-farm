@@ -2,7 +2,7 @@
 
 require 'core_extensions'
 
-using CoreExtensions
+# using CoreExtensions
 
 module Stratum
   class Job

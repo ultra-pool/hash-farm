@@ -1,13 +1,15 @@
 # -*- encoding : utf-8 -*-
 
-module CoreExtensions
-  refine Object do
+# module CoreExtensions
+  # refine Object do
+  class Object
     def boolean?
       self == !!self
     end
   end
   
-  refine Integer do
+  # refine Integer do
+  class Integer
     # intN.to_hex.hex => intN
     # ex : 285257.to_hex => "045a49"
     # ex : 2.to_hex(8) => "00000002"
@@ -24,7 +26,8 @@ module CoreExtensions
     end
   end
 
-  refine String do
+  # refine String do
+  class String
     # anHex.reverse_hex.reverse_hex => anHex +/- a leading 0
     # ex : "adbf986000000037".reverse_hex => "370000006098bfad"
     # ex : "-adbf986000000037".reverse_hex => "-370000006098bfad"
@@ -38,7 +41,7 @@ module CoreExtensions
 
     # ex : "adbf986000000037".to_bin => "\xAD\xBF\x98`\x00\x00\x007"
     def to_bin
-      [self].pack("H*")
+      [self].pack("H*").force_encoding("ascii")
     end
 
     # ex : "\xAD\xBF\x98`\x00\x00\x007".to_hex => "adbf986000000037"
@@ -71,18 +74,33 @@ module CoreExtensions
     end
   end
 
-  refine Hash do
+  # refine Array do
+  class Array
+    def to_h
+      h = {}
+      self.each_with_index do |v, i|
+        raise TypeError, "wrong element type #{v.class} at #{i} (expected array)" unless v.kind_of?( Array )
+        raise ArgumentError, "wrong array length at #{i} (expected 2, was #{v.size})" unless v.size == 2
+        h[ v[0] ] = v[1]
+      end
+      h
+    end
+  end unless Array.instance_methods.include?( :to_h )
+
+  # refine Hash do
+  class Hash
     def compact
       self.select { |_,v| v }
     end
   end
 
-  refine OpenStruct do
+  # refine OpenStruct do
+  class OpenStruct
     def delete( field )
       self.delete_field( field ) rescue nil
     end
   end
-end
+# end
 
 # module EventMachine
 #   # Allows to safely run EM in foreground or in a background 

@@ -4,7 +4,7 @@ require "core_extensions"
 require 'mining_helper'
 require "loggable"
 
-using CoreExtensions
+# using CoreExtensions
 
 class BlockHeader
   include Loggable
@@ -47,7 +47,7 @@ class BlockHeader
   end
 
   def sha_hash
-    @sha_hash ||= Bitcoin.dblsha( self.to_hex )
+    @sha_hash ||= MiningHelper.dblsha( self.to_hex )
   end
 
   def to_hash(algo=:scrypt)
@@ -180,7 +180,7 @@ class ShareTool < BlockHeader
   end
 
   def coinbase_hash
-    Bitcoin.dblsha( coinbase_hex )
+    MiningHelper.dblsha( coinbase_hex )
   end
 
   def share_target

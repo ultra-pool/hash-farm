@@ -3,7 +3,7 @@
 require 'core_extensions'
 require 'mining_helper'
 
-using CoreExtensions
+# using CoreExtensions
 
 class Share < ActiveRecord::Base
   belongs_to :worker
@@ -74,7 +74,7 @@ class Share < ActiveRecord::Base
     end
 
     def coinbase_hash
-      Bitcoin.dblsha( coinbase_hex )
+      MiningHelper.dblsha( coinbase_hex )
     end
 
     def merkle_root
@@ -107,7 +107,7 @@ class Share < ActiveRecord::Base
     end
 
     def sha_hash
-      @sha_hash ||= Bitcoin.dblsha( to_hex )
+      @sha_hash ||= MiningHelper.dblsha( to_hex )
     end
 
     def to_hash(algo=:scrypt)

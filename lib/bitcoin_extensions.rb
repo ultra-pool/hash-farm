@@ -6,7 +6,7 @@ require 'core_extensions'
 require 'mining_helper'
 
 module Bitcoin
-  using CoreExtensions
+  # using CoreExtensions
 
   class Script
     # If data is an integer, convert it to binary data little-endian encoded.
@@ -31,19 +31,19 @@ module Bitcoin
     end
   end
 
-  def self.dblsha( hex )
-    Digest::SHA256.digest( Digest::SHA256.digest( [hex].pack("H*") ) ).unpack("H*")[0].reverse_hex
-  end
+  # def self.dblsha( hex )
+  #   Digest::SHA256.digest( Digest::SHA256.digest( [hex].pack("H*") ) ).unpack("H*")[0].reverse_hex
+  # end
   
-  def self.pack_int(n)
-    b = [1]
-    while n > 127
-      b[0] += 1
-      b << (n %256)
-      n /= 256
-    end
-    (b << n).pack("C*")
-  end
+  # def self.pack_int(n)
+  #   b = [1]
+  #   while n > 127
+  #     b[0] += 1
+  #     b << (n %256)
+  #     n /= 256
+  #   end
+  #   (b << n).pack("C*")
+  # end
 
   # => [version, hash, valid]
   def self.parse_address( addr )
@@ -57,9 +57,4 @@ module Bitcoin
     hash160 = hash160_from_address( address )
     to_hash160_script( hash160 )
   end
-
-  # def self.nbits_to_difficulty( nbits )
-  #   mantisse, base = nbits.scan(/(\w\w)((?:\w\w){2,})/).first.map(&:hex)
-  #   BigDecimal.new( base ) * 2**( 8 * ( mantisse - 3 ) )
-  # end
 end # module bitcoin

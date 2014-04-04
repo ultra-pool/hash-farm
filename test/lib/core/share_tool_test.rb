@@ -6,7 +6,7 @@ require 'ostruct'
 
 require "core/share_tool"
 
-using CoreExtensions
+# using CoreExtensions
 
 class ShareToolTest < ActiveSupport::TestCase
 

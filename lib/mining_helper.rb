@@ -4,7 +4,7 @@ require 'bitcoin'
 require 'scrypt'
 require 'bitcoin_extensions'
 
-using CoreExtensions
+# using CoreExtensions
 
 module MiningHelper
 
@@ -16,48 +16,60 @@ module MiningHelper
 
   def self.parse_header( header_hex )
     version, prev_hash, merkle_root, ntime, nbits, nonce = split_header( header_hex ).map { |h| h.reverse_hex }
-    [version.hex, prev_hash, merkle_root, Time.at(ntime.hex), nbits, nonce.hex]
+    [version.hex, prev_hash, merkle_root, Time.at(ntime.hex), nbits, nonce.reverse_hex.hex]
   end
 
-  # => aFixnum
+
+  ######   TARGET / NBITS / DIFFICULTY SWITCHERS   #######
+
+  # target an Integer or a String HexBE encoded
+  # => str
   def self.target_to_nbits( target )
-    target = target.hex if target.kind_of?( String )
-    Bitcoin.encode_compact_bits( target )
+    target = target.to_hex(32) if target.kind_of?( Integer )
+    Bitcoin.encode_compact_bits( target ).to_hex(4)
   end
 
-  # => aString (Hex encoded BE, 32 Bytes)
+  # => str (Hex encoded BE, 32 Bytes)
   def self.nbits_to_target( nbits )
-    nbits = target.hex if nbits.kind_of?( String )
+    nbits = nbits.hex if nbits.kind_of?( String )
     Bitcoin.decode_compact_bits( nbits )
   end
 
+  # => int
   def self.difficulty_1_target
     0x00000000FFFF0000000000000000000000000000000000000000000000000000
   end
 
   # target an Integer or a String HexBE encoded
-  # => aFloat
+  # => float
   def self.difficulty_from_target( target )
     target = target.hex if target.kind_of?( String )
     (BigDecimal.new( difficulty_1_target ) / target.to_f).to_f
   end
 
-  # => aString (Hex encoded BE, 32 Bytes)
+  # diff a float
+  # => str (Hex encoded BE, 32 Bytes)
   def self.difficulty_to_target( diff )
     ( difficulty_1_target / diff.to_f ).to_i.to_hex(32)
   end
 
-  # target an Integer or a String HexBE encoded
-  # => aFixnum
+  # diff a float
+  # => fix
   def self.difficulty_to_nbits( diff )
     nbits_from_target( target_from_difficulty( diff ) )
   end
 
   class << self
+    alias_method :nbits_from_target, :target_to_nbits
+    alias_method :target_from_nbits, :nbits_to_target
+
     alias_method :target_to_difficulty, :difficulty_from_target
     alias_method :target_from_difficulty, :difficulty_to_target
     alias_method :nbits_from_difficulty, :difficulty_to_nbits
   end
+
+
+  ######     MERKLE  BRANCHES  /  MERKLE  ROOT    ######
 
   # hashes is an Array of little-endian encoded transactions' hash
   def self.mrkl_branches( hashes )

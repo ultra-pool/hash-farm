@@ -21,7 +21,6 @@ class RpcController
     @coin_name, @uri = coin_name, URI( rpc_url )
     @prog = "#{coin_name.downcase}d"
     @prog += " -testnet" if testnet
-    # @log = Loggers.get_logger( __FILE__ )
   end
 
   def started?

@@ -66,9 +66,8 @@ class WorkerConnection < EM::Connection
   end
 
   def post_init
-    init_stratum_handler
+    super
     init_listeners
-
     update_name
   end
 

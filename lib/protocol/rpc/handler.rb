@@ -12,8 +12,8 @@ require_relative '../rpc'
 # Use it as a mixin.
 #
 # EventMachine API :
-#   EM -> post_init ( call init_rpc_handler )
-#   EM -> unbind ( call finalize_rpc_handler )
+#   EM -> post_init ( call super )
+#   EM -> unbind ( call super )
 #   EM -> receive_data
 #   EM <- send_data
 # http://eventmachine.rubyforge.org/EventMachine/Connection.html
@@ -52,10 +52,6 @@ module Rpc
 
     # 
     def post_init
-      init_rpc_handler
-    end
-
-    def init_rpc_handler
       @skip_jsonrpc_field = true
       @response_waited = {} # ID => Callback
       @rport, @rip = Socket.unpack_sockaddr_in( get_peername ) if self.respond_to? :get_peername # From EventMachine::Connection
@@ -65,15 +61,11 @@ module Rpc
 
     # Register listener.
     def unbind
-      finalize_rpc_handler
-    end
-
-    def finalize_rpc_handler
       Handler.log.debug "#{ip_port} disconnected"
       emit('disconnect')
       Handler.emit('disconnect', self)
     rescue => err
-      puts "err in finalize_rpc_handler : #{err}"
+      puts "err in rpc::unbind : #{err}"
       puts err.backtrace[0...5].join("\n")
     end
 

@@ -12,8 +12,8 @@ require_relative './client_handler'
 # Use it as a mixin.
 #
 # EventMachine API :
-#   EM -> post_init ( call init_stratum_handler )
-#   EM -> unbind ( call finalize_stratum_handler )
+#   EM -> post_init ( call super )
+#   EM -> unbind ( call super )
 #
 # Attributs :
 #   mining
@@ -33,15 +33,11 @@ module Stratum
     include Rpc::Handler
     extend Listenable # for Handler.emit and Handler.on
 
-    # 
-    def post_init
-      init_stratum_handler
-    end
-
     attr_reader :mining, :block, :client
 
-    def init_stratum_handler
-      init_rpc_handler
+    # 
+    def post_init
+      super
       @skip_jsonrpc_field = true
 
       # init stratum modules.
@@ -68,16 +64,10 @@ module Stratum
     end
 
     def unbind
-      finalize_rpc_handler
-      finalize_stratum_handler
-    rescue => err
-      puts "err in unbind : #{err}"
-    end
-
-    def finalize_stratum_handler
+      super
       Handler.emit('disconnect', self)
     rescue => err
-      puts "err in finalize_stratum_handler : #{err}"
+      puts "err in stratum::unbind : #{err}"
     end
 
     def validate_request req

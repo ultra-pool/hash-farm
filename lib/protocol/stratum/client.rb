@@ -65,7 +65,6 @@ module Stratum
       
       @read_socket_interval = DEFAULT_READ_SOCKET_INTERVAL
 
-
       on( 'mining.set_difficulty' ) do |notif|
         @last_difficulty = notif.params.first
         log.verbose "Difficulty is now #{@last_difficulty}."
@@ -146,7 +145,7 @@ module Stratum
     def close
       @timer.cancel if @timer
       @socket.close if @socket
-      unbind
+      unbind()
     end
 
     def closed?

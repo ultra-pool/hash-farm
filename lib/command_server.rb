@@ -8,7 +8,8 @@ module PM
     include Rpc::Handler.dup
 
     def post_init
-      init_rpc_handler
+      super
+
       CommandServer.log.debug "Connexion to CommandServer received from #{ip_port}"
       @ms = MainServer.instance
 

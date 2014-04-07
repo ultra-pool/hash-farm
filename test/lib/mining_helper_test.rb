@@ -88,4 +88,55 @@ class MiningHelperTest < ActiveSupport::TestCase
 
     assert_equal root, MiningHelper.mrkl_branches_root( coinbase_tx, branches )
   end
+
+  test "it should compute dblsha" do
+    coinbase_hex  = "01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1703da0c060651f4d267018cd0335c9e917f000089000000ffffffff01a0a92d2a010000001976a9143bb598947d1dbf04ec724c41272548b04af487af88ac00000000"
+    coinbase_hash = "ffde72b3b184790f9ab27938248b0218d1ebf23b7cbe2a555caf71e3ddcc6062"
+
+    assert_equal coinbase_hash, MiningHelper.dblsha( coinbase_hex )
+  end
+
+  test "it should compute scrypt" do
+    block_hex = "02000000" + "391e4170f227b00db87b381b351d9371794aa629b092732298717111c271124c".reverse_hex +
+      "a650d73fb7a3204ed28b87e30705bf7e4a872f71a8125481dd084a7d6f04078a".reverse_hex + 1374999143.to_hex(4).reverse_hex +
+      "1b47c7ea".reverse_hex + 14575193.to_hex(4)
+    block_hash    = "00000000002bef4107f882f6115e0b01f348d21195dacd3582aa2dabd7985806"
+    
+    assert_equal block_hash, MiningHelper.scrypt( block_hex )
+    assert_equal block_hash, ScryptHelper.to_hash( block_hex )
+  end
+
+  test "it should compute hash_payout" do
+    skip
+    inputs = []
+    outputs = []
+    hash = ""
+    assert_equal hash, MiningHelper.hash_payout( inputs, outputs )
+  end
+
+  test "it should parse parse_address" do
+    address = "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
+    result = ["00",  "010966776006953d5567439e5e39f86a0d273bee", true ]
+    assert_equal result, MiningHelper.parse_address( address )
+  end
+
+  test "it should check coin_addr_type?" do
+    address = "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
+    assert MiningHelper.coin_addr_type?( address )
+    refute MiningHelper.coin_addr_type?( "toto" )
+  end
+
+  test "it should get hash160_from_address" do
+    address = "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
+    result = "010966776006953d5567439e5e39f86a0d273bee"
+    assert_equal result, MiningHelper.hash160_from_address( address )
+  end
+
+  test "it should compute scrypt difficulty from nbits" do
+    assert_equal 1.0, ScryptHelper.difficulty_from_nbits( "1e0ffff0" )
+  end
+
+  test "it should compute sha256 difficulty from nbits" do
+    assert_equal 1.0, Sha256CoinHelper.difficulty_from_nbits( "1d00ffff" )
+  end
 end

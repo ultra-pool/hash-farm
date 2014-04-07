@@ -122,7 +122,7 @@ module MiningHelper
   end
 
   def self.coin_addr_type?( addr )
-    addr.kind_of?( String ) && addr.match(/^[A-HJ-NP-Za-km-z1-9]{34}$/)
+    addr.kind_of?( String ) && addr.match(/^[A-HJ-NP-Za-km-z1-9]{33,34}$/)
   end
 end # module MiningHelper
 
@@ -146,8 +146,9 @@ module ScryptHelper
   end
 
   def self.difficulty_from_nbits( nbits )
+    nbits = nbits.hex if nbits.kind_of?( String )
     max_body, scaland = Math.log( 0x0ffff0 ), Math.log(256)
-    Math.exp(max_body - Math.log(nbits & 0x00ffffff) + scaland * (0x1e - ((nbits & 0xff000000) >> 12)))
+    Math.exp(max_body - Math.log(nbits & 0x00ffffff) + scaland * (0x1e - ((nbits & 0xff000000) >> 24)))
   end
 
 
@@ -166,8 +167,9 @@ module Sha256CoinHelper
   end
 
   def self.difficulty_from_nbits( nbits )
+    nbits = nbits.hex if nbits.kind_of?( String )
     max_body, scaland = Math.log( 0x00ffff ), Math.log(256)
-    Math.exp(max_body - Math.log(nbits & 0x00ffffff) + scaland * (0x1d - ((nbits & 0xff000000) >> 12)))
+    Math.exp(max_body - Math.log(nbits & 0x00ffffff) + scaland * (0x1d - ((nbits & 0xff000000) >> 24)))
   end
 
   class << self

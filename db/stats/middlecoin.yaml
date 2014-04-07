@@ -4107,3 +4107,17 @@
   :balance: 0.00452938
   :paid: 6.35507908
   :timestamp: 2014-04-07 11:50:17.634478375 +02:00
+- :accepted_mh: 3.2622
+  :rejected_mh: 0.0186
+  :immature: 0.00846386
+  :unexchanged: 0.00127312
+  :balance: 0.00458485
+  :paid: 6.35507908
+  :timestamp: 2014-04-07 12:13:17.976930649 +02:00
+- :accepted_mh: 3.2063
+  :rejected_mh: 0.0186
+  :immature: 0.00838573
+  :unexchanged: 0.00138219
+  :balance: 0.00462717
+  :paid: 6.35507908
+  :timestamp: 2014-04-07 12:26:04.048148865 +02:00

@@ -13,14 +13,6 @@ Usage :
   end
 USAGE
   
-  # Emit signal with some args.
-  # self.emit "signal", :with, ["some", "args"]
-  def emit(signal, *args)
-    @listenable ||= {}
-    @listenable[signal] ||= []
-    @listenable[signal].each { |m| m.call( *args ) }
-  end
-
   # Call it with a block,
   #   listenableObj.on( signal ) do |*args|
   #     puts args
@@ -45,9 +37,11 @@ USAGE
   def off(obj, signal=nil)
     if obj.kind_of?( String )
       signal, cb_id = obj.split(':')
+      cb_id = cb_id.to_i
+      return if ! @listenable[signal]
       @listenable[signal].delete_if do |cb| cb.object_id == cb_id end
-      signals = []
     elsif signal
+      return if ! @listenable[signal]
       @listenable[signal].delete_if do |callback|
         callback.binding.eval("self") == obj
       end
@@ -60,15 +54,27 @@ USAGE
     end
   end
 
-  def listener_callback(*args, &block)
-    if block_given?
-      block
-    elsif args.size == 1 && args.first.respond_to?( :call )
-      args.first.to_proc
-    elsif args.size == 2 && args[0].respond_to?( args[1] )
-      args[0].method( args[1] ).to_proc
-    else
-      raise ArgumentError, ListenableUsage
+  protected
+
+    # Emit signal with some args.
+    # self.emit "signal", :with, ["some", "args"]
+    def emit(signal, *args)
+      @listenable ||= {}
+      @listenable[signal] ||= []
+      @listenable[signal].each { |m| m.call( *args ) }
     end
-  end
+
+  private
+
+    def listener_callback(*args, &block)
+      if block_given?
+        block
+      elsif args.size == 1 && args.first.respond_to?( :call )
+        args.first.to_proc
+      elsif args.size == 2 && args[0].respond_to?( args[1] )
+        args[0].method( args[1] ).to_proc
+      else
+        raise ArgumentError, ListenableUsage
+      end
+    end
 end

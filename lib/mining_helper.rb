@@ -122,7 +122,7 @@ module MiningHelper
   end
 
   def self.coin_addr_type?( addr )
-    addr.kind_of?( String ) && addr.match(/^[A-HJ-NP-Za-km-z1-9]{33,34}$/)
+    addr.kind_of?( String ) && addr.match(/^[A-HJ-NP-Za-km-z1-9]{33,35}$/)
   end
 end # module MiningHelper
 

@@ -15,7 +15,7 @@ class CleverMining < MulticoinPool
     @account = '186e2PUgDoEZ14t25wYN8x1Ry5gtV3Qvj1'
     @stats_file = "db/stats/clever_mining.yaml"
     # Disable stats fetching due to CloudFire anti-DDos system blocking us.
-    # @timer_delay = 45.second
+    # @timer_delay = 10.second
 
     super
   end

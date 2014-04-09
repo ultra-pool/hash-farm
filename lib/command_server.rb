@@ -14,34 +14,49 @@ module PM
       @ms = MainServer.instance
 
       on( "request" ) do |req|
-        method = req.method.split('.')
-        case method.first
-        when "stop"
-          CommandServer.log.info "'stop' request received. Going to shutdown ProfitMining...";
-          req.respond( true )
-          @ms.stop
-          EM.stop
-        when "stats"
-          req.respond( stats )
-        when "jstats"
-          req.respond( jstats )
-        else
-          req.respond "Unknow method : '#{method.first}'"
+        begin
+          method = req.method.split('.')
+          case method.first
+          when "stop"
+            CommandServer.log.info "'stop' request received. Going to shutdown ProfitMining...";
+            req.respond( true )
+            @ms.stop
+            EM.stop
+          when "stats"
+            req.respond( stats )
+          when "jstats"
+            req.respond( jstats )
+          when "set_pool"
+            pool_name = req.params.first
+            pool = @ms.pools.find { |p| p.name == pool_name }
+            req.respond( pool.present? ? true : [ false, @ms.pools.map(&:name) ] )
+            @ms.current_pool = pool if pool.present?
+          else
+            req.respond "Unknow method : '#{method.first}'"
+          end
+        rescue => err
+          log.error err + err.backtrace[0..2]
+          log.error "with request #{req}"
         end
       end
       on( "notification" ) do |notif|
-        method = notif.method.split('.')
-        case method.first
-        when "block.mining"
-          coin_code, hash = *notif.params
-          pool = @ms.pools.find { |p| name =~ /^#{coin_code}/ }
-          if pool.present?
-            pool.block_notify( hash ) 
+        begin
+          method = notif.method.split('.')
+          case method.first
+          when "block.mining"
+            coin_code, hash = *notif.params
+            pool = @ms.pools.find { |p| name =~ /^#{coin_code}/ }
+            if pool.present?
+              pool.block_notify( hash )
+            else
+              log.warn "Block notification received for #{coin_code} but pool is not launch."
+            end
           else
-            log.warn "Block notification received for #{coin_code} but pool is not launch."
+            log.warn "Unknow method : '#{method.first}'"
           end
-        else
-          log.warn "Unknow method : '#{method.first}'"
+        rescue => err
+          log.error err + err.backtrace[0..2]
+          log.error "with notification #{notif}"
         end
       end
     end
@@ -53,10 +68,14 @@ module PM
       # @ms.balances.each do |name, b|
       #   s.puts "#{b} #{name},"
       # end
-      @ms.pools.each do |p|
-        s.puts "- #{p.name} :"
-        s.puts "\t* %d workers, %.1f MH/s" % [p.workers.size, p.hashrate * 10**-6]
-        s.puts "\t* %.2f mBTC / MH/s / day," % (p.profitability * 1000)
+      if @ms.current_pool
+        s.puts "- current pool : #{@ms.current_pool.name}"
+      else
+        @ms.pools.each do |p|
+          s.puts "- #{p.name} :"
+          s.puts "\t* %d workers, %.1f MH/s" % [p.workers.size, p.hashrate * 10**-6]
+          s.puts "\t* %.2f mBTC / MH/s / day," % (p.profitability * 1000)
+        end
       end
       s.string
     end

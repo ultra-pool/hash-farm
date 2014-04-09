@@ -54,3 +54,5 @@ gem 'ruby-scrypt', git: 'https://github.com/timmy72/ruby-scrypt', branch: 'maste
 gem "mocha"
 gem 'log4r'
 gem 'nokogiri'
+gem 'mechanize'
+gem 'octave-ruby'

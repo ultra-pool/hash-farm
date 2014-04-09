@@ -14,7 +14,7 @@ class Middlecoin < MulticoinPool
     @url_back = "stratum+tcp://@eu.middlecoin.com:3333"
     @account = '186e2PUgDoEZ14t25wYN8x1Ry5gtV3Qvj1'
     @stats_file = "db/stats/middlecoin.yaml"
-    @timer_delay = 15.minute
+    @timer_delay = 10.minute
 
     super
   end

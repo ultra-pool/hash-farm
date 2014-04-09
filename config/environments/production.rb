@@ -83,7 +83,7 @@ ProfitMining::Application.configure do
   config.main_server = OpenStruct.new
   config.main_server.host = "0.0.0.0"
   config.main_server.port = 3333
-  config.main_server.proxy_pools = ['clever_mining', 'middlecoin', 'coinshift', 'we_mine_all']
+  config.main_server.proxy_pools = ['middlecoin', 'coinshift', 'we_mine_all', 'clever_mining']
   
   config.command_server = OpenStruct.new
   config.command_server.host = "localhost"

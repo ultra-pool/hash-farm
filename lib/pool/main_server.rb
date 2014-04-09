@@ -16,7 +16,7 @@ class MainServer < Stratum::Server
   include Loggable
   include Listenable
 
-  attr_reader :pools
+  attr_reader :pools, :current_pool
 
   def initialize
     @config = ProfitMining.config.main_server
@@ -26,6 +26,7 @@ class MainServer < Stratum::Server
     @balance = false
     @disconnected_workers = {}
     @min_pool_hashrate = ProfitMining.config.min_pool_hashrate
+    @current_pool = nil
 
     init_event_machine
     init_pools
@@ -68,17 +69,19 @@ class MainServer < Stratum::Server
     log.info "CommandServer started on #{cs_conf.host}:#{cs_conf.port}"
 
     @pools.each(&:start)
+    switch_to_next_pool
     super
-    @balance_timer = EM.add_periodic_timer( BALANCE_INTERVAL ) do
-      balance_workers
-    end
+
+    # @balance_timer = EM.add_periodic_timer( BALANCE_INTERVAL ) do
+    #   balance_workers
+    # end
     self
   end
 
   def stop
     super
     EM.stop_server @command_server
-    @balance_timer.cancel
+    @balance_timer.cancel if @balance_timer
     self
   end
 
@@ -142,13 +145,46 @@ class MainServer < Stratum::Server
   end
 
   def choose_pool_for_new_worker
+    return @current_pool if @current_pool.present?
     sorted_pools = @pools.sort_by { |p| p.profitability || 0.0 }.reverse
     sorted_pools.find { |p| p.workers.empty? } ||
     sorted_pools.find { |p| p.hashrate < @min_pool_hashrate } ||
     sorted_pools.first
   end
 
-  BALANCE_INTERVAL = 15 * 60 # second
+  def switch_to_next_pool
+    if @current_pool.nil?
+      next_pool_idx = 0
+    else
+      next_pool_idx = @pools.index( @current_pool ) + 1
+      next_pool_idx %= @pools.size
+    end
+    log.info("Going to switch pool number #{next_pool_idx+1} on #{@pools.size}")
+
+    self.current_pool = @pools[next_pool_idx]
+    EM.add_timer( 4.days ) do
+      switch_to_next_pool
+    end
+  rescue => err
+    log.error err
+  end
+
+  def current_pool=( pool )
+    log.info("Change current pool from #{@current_pool.name} to #{pool.name}") if @current_pool
+    if @balance_timer
+      @balance_timer.cancel
+      @balance_timer = nil
+    end
+    @current_pool = pool
+    move_all_workers
+  end
+
+  def move_all_workers( pool=@current_pool )
+    log.info("Move all workers to #{pool.name}")
+    workers.each do |w| w.pool = pool end
+  end
+
+  BALANCE_INTERVAL = 15.minutes
 
   def balance_workers
     return if self.workers.empty? || @pools.size <= 1
@@ -161,6 +197,8 @@ class MainServer < Stratum::Server
   # Try to have min_hashrate in each pools, or at least one worker.
   # Complete more profitable pools first.
   def fill_holes( pools=@pools, min_hashrate=@min_pool_hashrate )
+    return if @current_pool.present?
+
     sorted_pools = pools.sort_by(&:profitability)
 
     # Balance each pool to have min_hashrate or at least 1 worker

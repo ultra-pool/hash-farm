@@ -43,7 +43,7 @@ class MulticoinPool
     @stats = load_stats
 
     Thread.new do EM.run end if ! EM.reactor_running?
-    EM.add_timer( 5 ) do start_load_page_timer end if @timer_delay
+    # EM.add_timer( 5 ) do start_load_page_timer end if @timer_delay
   end
 
   def start_load_page_timer
@@ -86,6 +86,37 @@ class MulticoinPool
     PoolPicker.profitability_of( @name )
   end
 
+  def shares( since=3.hour.ago, untl=Time.now )
+    Share.where( pool: @name, pool_result: true ).where( ["created_at > ? AND created_at <= ?", since, untl] )
+  end
+
+  def difficulty( since=3.hour.ago, untl=Time.now )
+    shares( since, untl ).map(&:difficulty).sum
+  end
+
+  def hashrate( since=3.hour.ago, untl=Time.now )
+    ( difficulty( since, untl ) / (untl - since) * 2 ** 32 ).round
+  end
+
+  def gains( since=3.hour.ago, untl=Time.now )
+    idx_untl = stats.size-1
+    idx_untl -= 1 while idx_untl > 0 && stats[idx_untl][:timestamp] > untl
+    idx_since = idx_untl
+    idx_since -= 1 while idx_since > 0 && stats[idx_since][:timestamp] > since
+
+    return 0.0 if idx_since == idx_untl
+
+    gain1 = stats[idx_since].values_at( :immature, :unexchanged, :balance, :paid ).sum
+    gain2 = stats[idx_untl].values_at( :immature, :unexchanged, :balance, :paid ).sum
+
+    gain2 - gain1
+  end
+
+  # => BTC / MH/s / hour
+  def profitability_X_hours( since=3.hour.ago, untl=Time.now )
+     gains( since, untl ) / hashrate( since, untl ) / (untl - since) * 1.hour
+  end
+
   def load_page( accepted_mh, rejected_mh, immature, unexchanged, balance, paid )
     # If values haven't changed.
     return if @stats[-1].present? && [immature, unexchanged, balance, paid] == @stats[-1].values_at(:immature,:unexchanged,:balance,:paid)
@@ -121,5 +152,15 @@ class MulticoinPool
     stats = t[(t.size > 50 ? -50 : 0)..-1]
   rescue => err
     MulticoinPool.log.error "in #{@name}.load_stats : #{err}\n" + err.backtrace[0...2].join("\n")
+  end
+
+  def method_missing(method, *args, **hargs)
+    m = method.to_s.split('_')
+    if ["shares", "difficulty", "hashrate", "gains", "profitability"].include?( m.first )
+      raise "#{m} misformed" if m[1].to_i != 0 && m[2] =~ /^(hours?|days?)$/
+      send( m[0], m[1].to_i.send(m[2]).ago, Time.now )
+    else
+      super
+    end
   end
 end

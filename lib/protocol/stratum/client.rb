@@ -122,7 +122,7 @@ module Stratum
 
     def send_data data
       @socket.write_nonblock( data )
-    rescue IO::WaitWritable, Errno::EINTR
+    rescue IO::WaitWritable
       log.info "Fail to send data. Retry in background... (#{data[0...80]}...)"
       # Retry in background
       Thread.new(data) do |data|
@@ -130,7 +130,7 @@ module Stratum
         @socket.write( data )
         log.info "Data sent (#{data[0...80]})."
       end
-    rescue Errno::EPIPE, Errno::ECONNRESET
+    rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR
       log.warn "Connection lost to #{ip_port}. Retry..."
       self.connect
       mining.on('subscribed') do self.send_data data end

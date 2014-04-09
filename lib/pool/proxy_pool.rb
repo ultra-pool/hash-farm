@@ -222,4 +222,13 @@ class ProxyPool < Pool
   def compute_diff( worker )
     [super, @next_diff].min
   end
+
+  # def shares( since=Time.now-1.hour, untl=now )
+  #   Share.where( pool: @name, pool_result: true ).where( ["created_at > ? AND created_at <= ?", since, untl] )
+  # end
+
+  # def hashrate2
+  #   sum_diff = shares.map(&:difficulty).sum
+  #   rate = (sum_diff / 1.hour * 2 ** 32).round
+  # end
 end

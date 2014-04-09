@@ -5,7 +5,7 @@ module Rpc
     attr_reader :handler, :method, :params
 
     def initialize handler, method, params=[]
-      @handler, @method, @params = handler, method, params
+      @handler, @method, @params = handler, method, params || []
     end
 
     def valide?

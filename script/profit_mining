@@ -72,7 +72,7 @@ when ""
   puts usage()
 else
   s = TCPSocket.new( $config[:host], $config[:port] )
-  s.puts( {id: 0, method: command.join('.')}.to_json )
+  s.puts( {id: 0, method: command.join('.'), params: ARGV}.to_json )
   sleep 0.1 while ! s.ready?
 
   data = ""

@@ -10,6 +10,10 @@ class ListenableTest < ActiveSupport::TestCase
     def do_emit_sig( *args )
       emit( 'sig', *args )
     end
+
+    def do_emit( sig, *args )
+      emit( sig, *args )
+    end
   end
 
   setup do
@@ -85,5 +89,66 @@ class ListenableTest < ActiveSupport::TestCase
     assert_raises NoMethodError do
       @listen.emit('raise')
     end
+  end
+
+  test "it should forward selected signal" do
+    class Forwarder1
+      include Listenable
+      def initialize(l)
+        @l = l
+        forward(@l, 'sig')
+      end 
+    end
+
+    f = Forwarder1.new(@listen)
+    callback_called = false
+    other_callback_called = false
+    f.on('sig') do callback_called = true end
+    f.on('other_sig') do |*args| other_callback_called = args end
+
+    @listen.do_emit('sig')
+    assert callback_called
+    refute other_callback_called
+  end
+
+  test "it should forward signal and args" do
+    class Forwarder1
+      include Listenable
+      def initialize(l)
+        @l = l
+        forward(@l, 'sig')
+      end 
+    end
+
+    f = Forwarder1.new(@listen)
+    callback_called = false
+    f.on('sig') do |*args| callback_called = args end
+
+    @listen.do_emit('sig', 1, 2)
+    assert_equal [1,2], callback_called
+  end
+
+  test "it should all forward signal" do
+    class Forwarder2
+      include Listenable
+      def initialize( l )
+        forward( l )
+      end
+    end
+
+    f = Forwarder2.new( @listen )
+    callback_called = false
+    other_callback_called = false
+    f.on('sig') do callback_called = true end
+    f.on('other_sig') do other_callback_called = true end
+
+    @listen.do_emit('sig')
+    assert callback_called
+    refute other_callback_called
+
+    callback_called = false
+    @listen.do_emit('other_sig')
+    refute callback_called
+    assert other_callback_called
   end
 end

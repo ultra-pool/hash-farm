@@ -114,6 +114,10 @@ class MiningHelperTest < ActiveSupport::TestCase
     assert_equal hash, MiningHelper.hash_payout( inputs, outputs )
   end
 
+  test "it should compute nb_hash from difficulty" do
+    assert_equal 2**48 / 0x00ffff, Sha256CoinHelper.difficulty_to_nb_hash( 1.0 )
+  end
+
   test "it should parse parse_address" do
     address = "16UwLL9Risc3QfPqBUvKofHmBQ7wMtjvM"
     result = ["00",  "010966776006953d5567439e5e39f86a0d273bee", true ]

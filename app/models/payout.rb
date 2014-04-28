@@ -136,7 +136,7 @@ class Payout < ActiveRecord::Base
         else
           user.update!( balance: user.balance + diff_sum )
         end
-        [user, diff, tx.outputs[user.btc_address], user.balance - bal_sum]
+        [user, diff, tx.outputs[user.payout_address], user.balance - bal_sum]
       end
 
       users_diff_sum = res.inject(0) { |r, t| r += t[1] }

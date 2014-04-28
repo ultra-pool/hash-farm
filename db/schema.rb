@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140402135114) do
+ActiveRecord::Schema.define(version: 20140428163357) do
 
   create_table "accounts", force: true do |t|
     t.integer  "coin_id",               null: false
@@ -37,6 +37,24 @@ ActiveRecord::Schema.define(version: 20140402135114) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "orders", force: true do |t|
+    t.integer  "user_id",                                                           null: false
+    t.string   "algo",       limit: 32,                          default: "scrypt", null: false
+    t.string   "url",                                                               null: false
+    t.string   "username",                                                          null: false
+    t.string   "password",                                                          null: false
+    t.decimal  "pay",                   precision: 16, scale: 8,                    null: false
+    t.decimal  "price",                 precision: 16, scale: 8,                    null: false
+    t.integer  "limit"
+    t.integer  "hash_done",  limit: 64,                          default: 0,        null: false
+    t.boolean  "complete",                                       default: false,    null: false
+    t.boolean  "running",                                        default: false,    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "orders", ["user_id"], name: "index_orders_on_user_id"
 
   create_table "payouts", force: true do |t|
     t.integer  "transaction_id", null: false
@@ -77,15 +95,17 @@ ActiveRecord::Schema.define(version: 20140402135114) do
   add_index "transactions", ["coin_id"], name: "index_transactions_on_coin_id"
 
   create_table "users", force: true do |t|
-    t.string   "name",         limit: 64
-    t.string   "password",     limit: 64
+    t.string   "name",           limit: 64
+    t.string   "password",       limit: 64
     t.string   "email"
-    t.string   "btc_address",  limit: 34,             null: false
-    t.boolean  "is_anonymous",                        null: false
-    t.boolean  "is_admin",                            null: false
+    t.string   "payout_address", limit: 34,                                          null: false
+    t.boolean  "is_anonymous",                                                       null: false
+    t.boolean  "is_admin",                                                           null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "balance",                 default: 0
+    t.integer  "balance",                                            default: 0
+    t.string   "wallet_address", limit: 34
+    t.decimal  "min_price",                 precision: 16, scale: 8, default: 0.001, null: false
   end
 
   create_table "workers", force: true do |t|

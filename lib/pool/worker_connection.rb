@@ -194,8 +194,8 @@ class WorkerConnection < EM::Connection
 
   ##########################################################
 
-  def btc_address
-    @model.user.btc_address rescue nil
+  def payout_address
+    @model.user.payout_address rescue nil
   end
 
   def valid_shares
@@ -273,15 +273,15 @@ class WorkerConnection < EM::Connection
   def update_name
     if rip =~ /^192.168.0.(\d+)$/
       @name = "EPIC-#{$~[1]}"
-      @name += "-" + btc_address[0..3] if btc_address.present?
+      @name += "-" + payout_address[0..3] if payout_address.present?
     elsif @model && @model.name.present? && @model.user.name.present?
       @name = @model.fullname
     elsif @model && @model.user.name.present?
       @name = @model.user.name + "@" + rport
     elsif @model && @model.name.present?
-      @name = @model.user.btc_address[0...8] + "@" + rport
-    elsif @btc_address
-      @name = @model.user.btc_address[0...8] + "@" + rport
+      @name = @model.user.payout_address[0...8] + "@" + rport
+    elsif @payout_address
+      @name = @model.user.payout_address[0...8] + "@" + rport
     else
       @name = ip_port
     end

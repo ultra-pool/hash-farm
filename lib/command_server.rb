@@ -1,6 +1,7 @@
 
 require 'socket'
 require 'protocol/rpc/handler'
+require_relative 'multicoin_pool'
 
 module PM
   module CommandServer
@@ -28,15 +29,51 @@ module PM
             req.respond( jstats )
           when "set_pool"
             pool_name = req.params.first
-            pool = @ms.pools.find { |p| p.name == pool_name }
-            req.respond( pool.present? ? true : [ false, @ms.pools.map(&:name) ] )
-            @ms.current_pool = pool if pool.present?
+            if pool_name != "none"
+              pool = @ms.pools.find { |p| p.name == pool_name }
+              req.respond( pool.present? ? true : [ false, @ms.pools.map(&:name) ] )
+              @ms.current_pool = pool if pool.present?
+            else
+              @ms.current_pool = nil
+              req.respond true
+            end
+          when "add_fake_rent_pool"
+            raise "Command available only with RentServer, not #{@ms.class}" unless @ms.kind_of?( RentServer )
+
+            if (Integer(req.params.first) rescue nil)
+              name = ProfitMining.config.main_server.proxy_pools[ req.params.first.to_i ]
+              mp = MulticoinPool[name]
+              url, username, password = mp.url, mp.account, mp.password || 'x'
+            elsif req.params.first.kind_of?( String )
+              uri = URI( req.params.first )
+              username, password, uri.user, uri.password = uri.user, uri.password, nil, nil
+              url = uri.to_s
+            else
+              raise "Invalid arg : #{req.params.first}"
+            end
+
+            pay = Float( req.params[1] ) rescue Order::PAY_MIN
+            price = Float( req.params[2] ) rescue 0.001
+            limit = Float( req.params[3] ) rescue nil
+            puts "New RentPool @#{name} for ~#{pay / price * 1.day / [@ms.hashrate * 10**-6, limit || 0.0].min} s"
+            order = Order.new(user_id: 1, url: url, username: username, password: password, pay: pay, price: price, limit: limit)
+            @ms.add_rent_pool( order )
+            req.respond true
+          when "reload"
+            Dir["lib/*.rb"].each { |f|
+              next if f =~ /market\.rb$/
+              puts "Reload #{f}"; load f
+            }
+            Dir["lib/pool/**.rb"].each { |f| puts "Reload #{f}"; load f }
+            req.respond true
           else
             req.respond "Unknow method : '#{method.first}'"
           end
         rescue => err
-          log.error err + err.backtrace[0..2]
-          log.error "with request #{req}"
+          req.respond false
+          CommandServer.log.error err
+          CommandServer.log.error err.backtrace[0..2].join("\n")
+          CommandServer.log.error "with request #{req}"
         end
       end
       on( "notification" ) do |notif|
@@ -49,14 +86,14 @@ module PM
             if pool.present?
               pool.block_notify( hash )
             else
-              log.warn "Block notification received for #{coin_code} but pool is not launch."
+              CommandServer.log.warn "Block notification received for #{coin_code} but pool is not launch."
             end
           else
-            log.warn "Unknow method : '#{method.first}'"
+            CommandServer.log.warn "Unknow method : '#{method.first}'"
           end
         rescue => err
-          log.error err + err.backtrace[0..2]
-          log.error "with notification #{notif}"
+          CommandServer.log.error err + err.backtrace[0..2]
+          CommandServer.log.error "with notification #{notif}"
         end
       end
     end
@@ -72,9 +109,10 @@ module PM
         s.puts "- current pool : #{@ms.current_pool.name}"
       else
         @ms.pools.each do |p|
-          s.puts "- #{p.name} :"
-          s.puts "\t* %d workers, %.1f MH/s" % [p.workers.size, p.hashrate * 10**-6]
-          s.puts "\t* %.2f mBTC / MH/s / day," % (p.profitability * 1000)
+          s.puts p.to_s
+          # s.puts "- #{p.name} :"
+          # s.puts "\t* %d workers, %.1f MH/s" % [p.workers.size, p.hashrate * 10**-6]
+          # s.puts "\t* %.2f mBTC / MH/s / day," % (p.profitability * 1000)
         end
       end
       s.string

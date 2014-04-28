@@ -52,7 +52,7 @@ class Transaction < ActiveRecord::Base
   # output_address is a BTC address, a User or an Account.
   # amount is in Satoshi.
   def add_output( output_address, amount )
-    output_address = output_address.btc_address if output_address.kind_of?( User )
+    output_address = output_address.payout_address if output_address.kind_of?( User )
     output_address = output_address.address if output_address.kind_of?( Account )
     @outputs[output_address] += amount.to_i
   end

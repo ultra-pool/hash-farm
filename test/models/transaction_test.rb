@@ -50,19 +50,19 @@ class TransactionTest < ActiveSupport::TestCase
     tx = Transaction.new( coin: @coin )
     assert tx.outputs.empty?
 
-    tx.add_output( users(:barbu).btc_address , 10**6 )
+    tx.add_output( users(:barbu).payout_address , 10**6 )
     assert_equal 1, tx.outputs.size
-    assert_equal 10**6, tx.outputs[users(:barbu).btc_address]
+    assert_equal 10**6, tx.outputs[users(:barbu).payout_address]
 
-    tx.add_output( users(:one).btc_address , 10**7 )
+    tx.add_output( users(:one).payout_address , 10**7 )
     assert_equal 2, tx.outputs.size
-    assert_equal 10**7, tx.outputs[users(:one).btc_address]
-    assert_equal 10**6, tx.outputs[users(:barbu).btc_address]
+    assert_equal 10**7, tx.outputs[users(:one).payout_address]
+    assert_equal 10**6, tx.outputs[users(:barbu).payout_address]
 
     tx.add_output( users(:barbu), 10**6 )
     assert_equal 2, tx.outputs.size
-    assert_equal 2 * 10**6, tx.outputs[users(:barbu).btc_address]
-    assert_equal 10**7, tx.outputs[users(:one).btc_address]
+    assert_equal 2 * 10**6, tx.outputs[users(:barbu).payout_address]
+    assert_equal 10**7, tx.outputs[users(:one).payout_address]
   end
 
   test "it should compute total_input" do

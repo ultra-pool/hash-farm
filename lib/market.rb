@@ -1,7 +1,5 @@
 # -*- encoding : utf-8 -*-
 
-require "./core/coin"
-
 # When subclassing Market,
 # you MUST reimplement supported_currencies, support? and last_trade.
 class Market
@@ -64,4 +62,4 @@ class Market
 end unless defined? Market
 
 # Load all markets files to make them available via Market methods.
-Dir["./markets/*.rb"].each {|file| require file }
+# Dir["lib/markets/*.rb"].each {|file| require file }

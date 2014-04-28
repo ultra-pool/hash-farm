@@ -39,7 +39,7 @@ class PayoutTest < ActiveSupport::TestCase
     previous_barbu_balance = barbu.balance
     previous_balance = accounts(:balances)
     payout = Payout.new( @accounts, @payout_shares )
-    refute payout.tx.outputs.key?( barbu.btc_address )
+    refute payout.tx.outputs.key?( barbu.payout_address )
     assert_operator previous_barbu_balance, :<, users(:barbu).reload.balance
 
     assert payout.tx.outputs[ accounts(:balances).address ]
@@ -85,12 +85,12 @@ class PayoutTest < ActiveSupport::TestCase
     assert_equal waited_tt_output, payout.tx.total_output
     assert_equal 2.0, payout.total_diff
     assert_equal 4, payout.tx.outputs.size, payout.tx.outputs.keys # one, two, fee, balance, 
-    assert_equal [users(:one).btc_address, users(:two).btc_address, accounts(:fees).address, accounts(:balances).address].sort, payout.tx.outputs.keys.sort
-    assert_equal 95940000, payout.tx.outputs[users(:two).btc_address]
-    assert_equal 1462500, payout.tx.outputs[users(:one).btc_address]
+    assert_equal [users(:one).payout_address, users(:two).payout_address, accounts(:fees).address, accounts(:balances).address].sort, payout.tx.outputs.keys.sort
+    assert_equal 95940000, payout.tx.outputs[users(:two).payout_address]
+    assert_equal 1462500, payout.tx.outputs[users(:one).payout_address]
     assert_equal waited_our_fees, payout.tx.outputs[accounts(:fees).address]
     assert_equal 97500, payout.tx.outputs[accounts(:balances).address]
-    refute payout.tx.outputs.key?( users(:barbu).btc_address )
+    refute payout.tx.outputs.key?( users(:barbu).payout_address )
 
     # Change balances
     assert_equal 0, users(:one).reload.balance

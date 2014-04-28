@@ -12,10 +12,11 @@ require 'protocol/stratum/submit'
 class Pool
   include Loggable
   include Listenable
+  include Comparable
 
   @@pools = {}
 
-  def []( name ) @@pools[name] end
+  def self.[]( name ) @@pools[name] end
 
   DESIRED_GLOBAL_SHARE_RATE = 0.2 # 2 share per second
 
@@ -197,10 +198,15 @@ class Pool
 
   def to_s
     nb_max = 3
-    s = "%s : %d workers, %.1f MH/s, %.1f BTC/MHs/day." % [@name, @workers.size, hashrate * 10**-6, profitability]
+    s = "%s : %d workers, %.1f MH/s, %.1f BTC/MHs/day" % [@name, @workers.size, hashrate * 10**-6, profitability]
     return s if @workers.size == 0
     s += " " + @workers[0...nb_max].map(&:name).to_s
     s += "...%d more]" % (@workers.size - nb_max) if @workers.size > nb_max
     s
+  end
+  
+  def <=>( o )
+    return nil if ! o.kind_of?( Pool )
+    profitability <=> o.profitability
   end
 end

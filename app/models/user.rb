@@ -16,6 +16,6 @@ class User < ActiveRecord::Base
   end
 
   def name
-    super || self.btc_address
+    super || self.payout_address
   end
 end

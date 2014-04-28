@@ -20,6 +20,9 @@ require_relative './worker_connection'
 #   started
 #   stopped
 #   error(err)
+#   bad_connection
+#   lost_connection
+#   good_connection
 #
 class ProxyPool < Pool
   include Loggable
@@ -30,6 +33,7 @@ class ProxyPool < Pool
   attr_reader :notifications, :extra_nonce_1, :extra_nonce_2_size
   attr_reader :accepted_shares, :rejected_shares
   attr_reader :jobs_pdiff
+  attr_reader :authentified
 
   #
   # ProxyPool.new( host, port, username, password )
@@ -60,6 +64,7 @@ class ProxyPool < Pool
     super( opt[:name] || @host, opt )
 
     @proxy = Stratum::Client.new( @host, @port, back: @options[:back] )
+    @authentified = false
 
     @jobs_pdiff = {}
 
@@ -67,10 +72,11 @@ class ProxyPool < Pool
   end
 
   def init_listeners
-    on( 'error' ) do |error| log.error( error.to_s ) end
+    on( 'error' ) do |error| ProxyPool.log.error( error.to_s ) end
     @proxy.on( 'connected' ) { authentify }
-    @proxy.on( 'error' ) { |*params| emit( 'error', *params ) }
     @proxy.on( 'disconnect' ) { emit( 'stopped' ) }
+
+    forward( @proxy, 'error' )
   end
 
   def authentify( callback=nil )
@@ -84,7 +90,7 @@ class ProxyPool < Pool
           @session_id = @notifications[0][1]
           @worker_extra_nonce_2_size = @extra_nonce_2_size > 1 ? (@extra_nonce_2_size / 2.0).floor : @extra_nonce_2_size
           @proxy_extra_nonce_2_size = @extra_nonce_2_size - @worker_extra_nonce_2_size
-          log.verbose( "[#{@host}] subscribe : extra1=%s, extra2size=%d" % [@extra_nonce_1, @extra_nonce_2_size] )
+          ProxyPool.log.verbose( "[#{@host}] subscribe : extra1=%s, extra2size=%d" % [@extra_nonce_1, @extra_nonce_2_size] )
 
           @workers.each { |w| w.client.reconnect }
         end
@@ -92,8 +98,9 @@ class ProxyPool < Pool
         @proxy.mining.authorize( @username, @password ) do |resp|
           if resp.result? && resp.result
             emit( 'started' )
+            @authentified = true
             callback.call if callback.present?
-            log.info( "[#{@host}] Started" )
+            ProxyPool.log.info( "[#{@host}] Started" )
           elsif resp.result?
             emit( 'error', "not authorized" )
           else
@@ -108,17 +115,25 @@ class ProxyPool < Pool
 
   def start
     @proxy.connect
+    # Rescue if fail to authentify.
+    EM.add_timer( 30.seconds ) do
+      if ! self.authentified
+        log.error "[#{name}] Fail to authentify. Retry"
+        stop
+        EM.add_timer( 10.seconds ) do start end
+      end
+    end
     self
   end
 
   def stop
     @proxy.close
-    log.verbose( "[#{@host}] Stopped." )
+    ProxyPool.log.verbose( "[#{@host}] Stopped." )
     self
   end
 
   def notify_all_workers job=@last_job
-    log.verbose( "[#{@host}] Notify #{@workers.size} workers with job #{job.id}." )
+    ProxyPool.log.verbose( "[#{@host}] Notify #{@workers.size} workers with job #{job.id}." )
     @workers.each do |worker|
       worker.notify( job )
     end
@@ -128,13 +143,13 @@ class ProxyPool < Pool
 
   def on_pool_set_difficulty diff
     @next_diff = diff.to_f / 2**16
-    log.verbose( "[#{@host}] New difficulty received : #{@next_diff}." )
+    ProxyPool.log.verbose( "[#{@host}] New difficulty received : #{@next_diff}." )
     @workers.each do |worker| adjust_difficulty( worker ) end
     # @workers.each do |worker| worker.set_difficulty @next_diff end
   end
 
   def on_pool_notify job
-    log.verbose( "[#{@host}] New job received : #{job}." )
+    ProxyPool.log.verbose( "[#{@host}] New job received : #{job}." )
     job.pool = @name
     # We notify workers as quickly as possible
     notify_all_workers( job )
@@ -161,7 +176,7 @@ class ProxyPool < Pool
   ##########################################################
 
   def subscribe worker
-    log.debug "proxy pool subscribe"
+    ProxyPool.log.debug "proxy pool subscribe"
     extra1, extra2size, diff, job = super
     pool_extra_nonce_2 = @proxy_extra_nonce_2_size > 0 ? rand( 256**@proxy_extra_nonce_2_size ).to_hex(@proxy_extra_nonce_2_size) : ''
     [@extra_nonce_1 + pool_extra_nonce_2, @worker_extra_nonce_2_size, diff, job]
@@ -177,20 +192,20 @@ class ProxyPool < Pool
     # Check valid pool share
     _, job_id, extranonce2, ntime, nonce = *req.params
     pdiff = jobs_pdiff[job_id]
-    log.debug "pdiff for #{job_id} = #{pdiff}"
+    ProxyPool.log.debug "pdiff for #{job_id} = #{pdiff}"
     if share.match_difficulty( pdiff )
       extra_nonce_2 = worker.extra_nonce_1[@extra_nonce_1.size...@extra_nonce_1.size+@proxy_extra_nonce_2_size*2] # hex to byte
       extra_nonce_2 += share.extra_nonce_2
       pool_job = [@username, job_id, extra_nonce_2, ntime, nonce]
-      log.debug("Send back pool job : #{pool_job}")
+      ProxyPool.log.debug("Send back pool job : #{pool_job}")
       @proxy.mining.submit( *pool_job ) do |resp|
         if resp.result?
           @accepted_shares += 1
-          log.info "#{job_id}/#{share.ident}@#{worker.name} Accepted by pool"
+          ProxyPool.log.info "#{job_id}/#{share.ident}@#{worker.name} Accepted by pool"
           share.pool_result = true
         else
           @rejected_shares += 1
-          log.warn "#{job_id}/#{share.ident}@#{worker.name} Not accepted by pool : #{resp.error}"
+          ProxyPool.log.warn "#{job_id}/#{share.ident}@#{worker.name} Not accepted by pool : #{resp.error}"
           share.pool_result = false
           share.reason = resp.error.to_s
         end
@@ -202,13 +217,13 @@ class ProxyPool < Pool
 
     share
   rescue ArgumentError => err
-    log.warn "[#{worker.name}] Fail on submit : #{err}"
+    ProxyPool.log.warn "[#{worker.name}] Fail on submit : #{err}"
     req.respond( false ) && nil
   rescue => err
-    log.error err
-    log.error err.backtrace[0..5].join("\n")
-    log.error "worker=#{worker.inspect}"
-    log.error "share=#{share.inspect}"
+    ProxyPool.log.error err
+    ProxyPool.log.error err.backtrace[0..5].join("\n")
+    ProxyPool.log.error "worker=#{worker.inspect}"
+    ProxyPool.log.error "share=#{share.inspect}"
     req.respond( false ) && nil
   end
 
@@ -223,6 +238,9 @@ class ProxyPool < Pool
     [super, @next_diff].min
   end
 
+  def profitability
+    self.authentified ? super : 0.0
+  end
   # def shares( since=Time.now-1.hour, untl=now )
   #   Share.where( pool: @name, pool_result: true ).where( ["created_at > ? AND created_at <= ?", since, untl] )
   # end

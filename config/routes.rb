@@ -1,4 +1,6 @@
 ProfitMining::Application.routes.draw do
+  resources :orders
+
   resources :payouts
 
   resources :transactions

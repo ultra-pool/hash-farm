@@ -108,6 +108,10 @@ module MiningHelper
     )
   end
 
+  def self.difficulty_to_nb_hash( diff )
+    (diff.to_f * 2**48 / 0xffff).to_i
+  end
+
   ######   ADDRESS  HELPERS   #######
 
   def self.hash160_from_address( addr )

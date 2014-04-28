@@ -5,7 +5,7 @@ class Worker < ActiveRecord::Base
   before_validation :set_is_anonymous, if: -> { self.is_anonymous.nil? }
 
   def fullname
-    (user.name || user.btc_address) + "." + (self.name || "anonymous")
+    (user.name || user.payout_address) + "." + (self.name || "anonymous")
   end
 
   def set_is_anonymous

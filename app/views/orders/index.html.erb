@@ -1,0 +1,47 @@
+<h1>Listing orders</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Algo</th>
+      <th>Url</th>
+      <th>Username</th>
+      <th>Password</th>
+      <th>Pay</th>
+      <th>Price</th>
+      <th>Limit</th>
+      <th>Hash done</th>
+      <th>Complete</th>
+      <th>Running</th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @orders.each do |order| %>
+      <tr>
+        <td><%= order.user %></td>
+        <td><%= order.algo %></td>
+        <td><%= order.url %></td>
+        <td><%= order.username %></td>
+        <td><%= order.password %></td>
+        <td><%= order.pay %></td>
+        <td><%= order.price %></td>
+        <td><%= order.limit %></td>
+        <td><%= order.hash_done %></td>
+        <td><%= order.complete %></td>
+        <td><%= order.running %></td>
+        <td><%= link_to 'Show', order %></td>
+        <td><%= link_to 'Edit', edit_order_path(order) %></td>
+        <td><%= link_to 'Destroy', order, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Order', new_order_path %>

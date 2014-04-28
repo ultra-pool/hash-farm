@@ -2,9 +2,8 @@
 
 require 'open-uri'
 require 'socket'
-require 'json'
 require 'eventmachine'
-require "io/wait"
+require "io/wait" # For @socket.ready?
 
 require 'loggable'
 require_relative '../stratum'
@@ -51,17 +50,20 @@ end
 module Stratum
   class Client
     include Loggable
+    include Listenable
     include Stratum::Handler.dup
 
     DEFAULT_READ_SOCKET_INTERVAL = Rails.env.test? ? 0.01 : 0.2
     
     attr_reader :host, :port
-    attr_reader :last_difficulty, :last_notification
     attr_accessor :read_socket_interval
 
+    # For debug purpose
+    attr_reader :last_difficulty, :last_notification
+
     def initialize( host, port, options={} )
-      @host, @port, @options = host, port, options
-      @fibo_a, @fibo_b = 1, 1
+      @host, @port = host, port
+      @back_uri = options[:back] && URI(options[:back])
       
       @read_socket_interval = DEFAULT_READ_SOCKET_INTERVAL
 
@@ -75,76 +77,66 @@ module Stratum
       end
     end
 
-    def connect( host=@host, port=@port )
-      log.verbose "Connecting to #{host}:#{port}..."
-      @socket = TCPSocket.new( host, port )
-      _, @rport, _, @rip = @socket.peeraddr
+    def connect
+      _connect( @host, @port )
       post_init() # Stratum::Handler
 
       raise "EventMachine must be running." if ! EM.reactor_running?
-      @timer.cancel if @timer
       @timer = EM.add_periodic_timer( @read_socket_interval ) do
-        data = ""
-        data += @socket.read_nonblock( 4096 ) while @socket.ready?
-        receive_data( data ) unless data.empty?
+        begin
+          data = read_data
+          receive_data( data ) unless data.empty?
+        rescue => err
+          log.error "#{err}\n" + err.backtrace[0..5].join("\n")
+        end
       end
 
       emit('connected')
-    rescue => err
-      # Save previous url
-      phost, pport = host, port
-      
-      # Get backup url
-      if @options[:back].nil?
-        raise
-      elsif @options[:back].kind_of?( URI )
-        uri = @options[:back]
-        host, port = uri.host, uri.port
-      elsif @options[:back].kind_of?( String )
-        uri = URI( @options[:back] )
-        host, port = uri.host, uri.port
-      elsif @options[:back].kind_of?( Array )
-        host, port = *@options[:back]
-      end
-      # Reraise if we were already on backup
-      raise if phost == host && pport == port
-      
-      # Try to connect with backup
-      log.warn "Fail to start @#{phost}:#{pport}. Try on backup@#{host}:#{port}.. (#{err})"
-      connect( host, port )
-      
-      # If fail retry every x second, fibonacci increment
-      if @socket.nil?
-        @fibo_a, @fibo_b = @fibo_a + @fibo_b, @fibo_a
-        EM.add_timer( @fibo_a ) do connect() end
-      end
+    end
+
+    def reconnect
+      log.warn "Connection lost to #{ip_port}. Try to reconnect..."
+      _disconnect
+      _connect
+      emit('reconnected')
+    end
+
+    def read_data
+      data = ""
+      data += @socket.read_nonblock( 4096 ) while @socket.ready?
+      data
+    rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR
+      self.reconnect
+      nil
     end
 
     def send_data data
-      @socket.write_nonblock( data )
-    rescue IO::WaitWritable
-      log.info "Fail to send data. Retry in background... (#{data[0...80]}...)"
-      # Retry in background
-      Thread.new(data) do |data|
-        IO.select(nil, [@socket])
+      print '- '; $stdout.flush
+      if IO.select(nil, [@socket], nil, 0.5)
+        print "write..."; $stdout.flush
         @socket.write( data )
-        log.info "Data sent (#{data[0...80]})."
+        puts "ed"
+      else
+        puts "#{ip_port} not available"
+        raise
       end
-    rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR
-      log.warn "Connection lost to #{ip_port}. Retry..."
-      self.connect
-      mining.on('subscribed') do self.send_data data end
+    rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR, Timeout::Error
+      self.reconnect
+      # mining.on('authorized') do self.send_data( data ) end
+      log.error "Share lost : #{data}" if data =~ "mining.submit"
     rescue => err
       log.error "Error during send_data to #{ip_port} : #{err}. Retry...\n#{err.backtrace[0]}"
       count ||= 0
       count += 1
       sleep(0.1)
       retry if count < 3
+      self.reconnect
     end
 
     def close
+      _disconnect
       @timer.cancel if @timer
-      @socket.close if @socket
+      @timer = nil
       unbind()
     end
 
@@ -157,6 +149,28 @@ module Stratum
     end
     def to_s
       "#Client@%s:%d" % [host, port]
+    end
+
+    # private
+
+    def _connect( host, port )
+      log.verbose "Connecting to #{host}:#{port}..."
+      @socket = TCPSocket.new( host, port )
+      _, @rport, _, @rip = @socket.peeraddr
+    rescue => err
+      log.error err, err.backtrace[0...5].join("\n")
+      # Reraise if we were already on backup or if there is no backup.
+      raise if host != @host || port != @port || @back_uri.nil?
+      
+      # Try to connect with backup
+      log.warn "Fail to connect @#{@host}:#{@port}. Try on backup@#{back_uri.host}:#{back_uri.port}.. (#{err})"
+      _connect( back_uri.host, back_uri.port )
+    end
+
+    def _disconnect
+      log.verbose "Disconnecting..."
+      @socket.close if @socket
+      @socket = nil
     end
   end # class Client
 end # module Stratum

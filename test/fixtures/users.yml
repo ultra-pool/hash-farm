@@ -4,12 +4,12 @@ one:
   name: MyString
   password: MyString
   email: MyString
-  btc_address: mkyoyvAQTzQFd8tr7D9uPT9co1Qj88nstD
+  payout_address: mkyoyvAQTzQFd8tr7D9uPT9co1Qj88nstD
   is_anonymous: false
   is_admin: false
 
 two:
-  btc_address: mqzLSYtjPgxYu67UjzsjXycpGno5nHv6tP
+  payout_address: mqzLSYtjPgxYu67UjzsjXycpGno5nHv6tP
   is_anonymous: true
   is_admin: false
 
@@ -17,6 +17,6 @@ barbu:
   name: barbu
   password: toto
   email: barbu@mail.com
-  btc_address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh
+  payout_address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh
   is_anonymous: false
   is_admin: true

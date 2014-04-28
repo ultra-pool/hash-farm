@@ -62,6 +62,16 @@ USAGE
       @listenable ||= {}
       @listenable[signal] ||= []
       @listenable[signal].each { |m| m.call( *args ) }
+      @listenable[:__all] ||= []
+      @listenable[:__all].each { |m| m.call( signal, *args ) }
+    end
+
+    def forward( obj, signal=:__all )
+      obj.on( signal ) do |*params|
+        # When signal is :__all, the real signal is embedded in given params.
+        params.unshift( signal ) unless signal == :__all
+        emit( *params )
+      end
     end
 
   private

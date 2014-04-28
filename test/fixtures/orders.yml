@@ -1,0 +1,27 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 
+  algo: MyString
+  url: MyString
+  username: MyString
+  password: MyString
+  pay: 9.99
+  price: 9.99
+  limit: 1
+  hash_done: 1
+  complete: false
+  running: false
+
+two:
+  user_id: 
+  algo: MyString
+  url: MyString
+  username: MyString
+  password: MyString
+  pay: 9.99
+  price: 9.99
+  limit: 1
+  hash_done: 1
+  complete: false
+  running: false

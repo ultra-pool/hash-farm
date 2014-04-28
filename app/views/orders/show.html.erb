@@ -1,0 +1,59 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>User:</strong>
+  <%= @order.user %>
+</p>
+
+<p>
+  <strong>Algo:</strong>
+  <%= @order.algo %>
+</p>
+
+<p>
+  <strong>Url:</strong>
+  <%= @order.url %>
+</p>
+
+<p>
+  <strong>Username:</strong>
+  <%= @order.username %>
+</p>
+
+<p>
+  <strong>Password:</strong>
+  <%= @order.password %>
+</p>
+
+<p>
+  <strong>Pay:</strong>
+  <%= @order.pay %>
+</p>
+
+<p>
+  <strong>Price:</strong>
+  <%= @order.price %>
+</p>
+
+<p>
+  <strong>Limit:</strong>
+  <%= @order.limit %>
+</p>
+
+<p>
+  <strong>Hash done:</strong>
+  <%= @order.hash_done %>
+</p>
+
+<p>
+  <strong>Complete:</strong>
+  <%= @order.complete %>
+</p>
+
+<p>
+  <strong>Running:</strong>
+  <%= @order.running %>
+</p>
+
+<%= link_to 'Edit', edit_order_path(@order) %> |
+<%= link_to 'Back', orders_path %>

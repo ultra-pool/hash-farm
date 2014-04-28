@@ -1,12 +1,19 @@
-Profit Mining
-=============
+Hash Farm
+=========
 
-ProfitMining is intended to be a meta-pool, a pool of pool.
-ProfitMining assure you the best profitability at each time, by mining
+HashFarm is intended to be a hashrate leaser.
+HashFarm assure buyers to get the hashrate they paid for, and miners to be paid for the shares they share.
 
-- in the best multicoin pool ;
-- in best profitable coins at the moment ;
-- at the best price as a hashrate renter.
+Miners just connect to us at www.hash.farm:3333
+
+CGMiner is to old and buggy and doesn't work with our pool.
+Miners must use CPUMiner or SGMiner.
+
+Buyers send BTC on there HashFarm wallet, and create orders.
+An order contains the url and the username/pasword it want to connect to,
+the sum he wants to pay in BTC, and the price in BTC/MHs/Day for which workers will work.
+
+He can precise a hashrate limit, to don't mine to fast (advise for new coins),
 
 Installation
 ------------
@@ -27,5 +34,3 @@ Configuration
 In config/environments/, you can configure :
 
 - server listening port (default: 3333)
-- multicoin pools to watch (default: all)
-

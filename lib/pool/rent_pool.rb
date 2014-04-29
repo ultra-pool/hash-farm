@@ -25,7 +25,7 @@ class RentPool < ProxyPool
     raise "Cannot start a pool with done order." if order.done?
     super( order.uri, name: order.pool_name )
     @order = order
-    @max_hashrate = order.limit * 10**6 || Float::INFINITY
+    @max_hashrate = order.limit
     log.info "[#{name}] max_hashrate=#{@max_hashrate}, hash_to_do=#{@order.hash_to_do * 10**-9}, prof=#{order.price}"
   end
 
@@ -49,7 +49,7 @@ class RentPool < ProxyPool
         order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
         order.save!
       end
-      log.info "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?" unless @order.limit == Float::INFINITY
+      log.info "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?"
       if done?
         emit('done')
       end

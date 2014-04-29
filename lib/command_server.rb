@@ -55,7 +55,8 @@ module PM
             pay = Float( req.params[1] ) rescue Order::PAY_MIN
             price = Float( req.params[2] ) rescue 0.001
             limit = Float( req.params[3] ) rescue nil
-            puts "New RentPool @#{name} for ~#{pay / price * 1.day / [@ms.hashrate * 10**-6, limit || 0.0].min} s"
+            prev_hashrate = [@ms.hashrate * 10**-6, limit || Float::INFINITY].min
+            puts "New RentPool @#{name} for ~#{pay / price * 1.day / prev_hashrate} s at #{prev_hashrate} MHs"
             order = Order.new(user_id: 1, url: url, username: username, password: password, pay: pay, price: price, limit: limit)
             @ms.add_rent_pool( order )
             req.respond true

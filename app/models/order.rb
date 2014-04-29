@@ -48,14 +48,15 @@ class Order < ActiveRecord::Base
   # Convert nil to Float::INFINITY
   # => mhs
   def limit
-    self[:limit].nil? ? Float::INFINITY : self[:limit]
+    lim = read_attribute(:limit)
+    lim.nil? ? Float::INFINITY : lim
   end
 
   # Convert Float::INFINITY to nil
   # => limit
-  def limit=( limit )
-    self[:limit] = ( Float::INFINITY ? nil : limit )
-    limit
+  def limit=( lim )
+    write_attribute(:limit, lim == Float::INFINITY ? nil : lim )
+    lim
   end
 
   def pool

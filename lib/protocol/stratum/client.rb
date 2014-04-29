@@ -80,17 +80,7 @@ module Stratum
     def connect
       _connect( @host, @port )
       post_init() # Stratum::Handler
-
-      raise "EventMachine must be running." if ! EM.reactor_running?
-      @timer = EM.add_periodic_timer( @read_socket_interval ) do
-        begin
-          data = read_data
-          receive_data( data ) unless data.empty?
-        rescue => err
-          log.error "#{err}\n" + err.backtrace[0..5].join("\n")
-        end
-      end
-
+      _start_timer
       emit('connected')
     end
 
@@ -106,7 +96,11 @@ module Stratum
       data += @socket.read_nonblock( 4096 ) while @socket.ready?
       data
     rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR
+      log.error "Lost connection on reading..."
       self.reconnect
+      nil
+    rescue => err
+      log.error "while reading : #{err}\n" + err.backtrace[0...5].join("\n")
       nil
     end
 
@@ -121,9 +115,9 @@ module Stratum
         raise
       end
     rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR, Timeout::Error
+      log.error "Lost connection on writing..."
       self.reconnect
-      # mining.on('authorized') do self.send_data( data ) end
-      log.error "Share lost : #{data}" if data =~ "mining.submit"
+      log.error "Share lost : #{data}" if data =~ /submit/
     rescue => err
       log.error "Error during send_data to #{ip_port} : #{err}. Retry...\n#{err.backtrace[0]}"
       count ||= 0
@@ -134,14 +128,13 @@ module Stratum
     end
 
     def close
+      _stop_timer
       _disconnect
-      @timer.cancel if @timer
-      @timer = nil
       unbind()
     end
 
     def closed?
-      @socket.closed?
+      @socket.nil? || @socket.closed?
     end
 
     def inspect
@@ -171,6 +164,23 @@ module Stratum
       log.verbose "Disconnecting..."
       @socket.close if @socket
       @socket = nil
+    end
+
+    def _start_timer
+      raise "EventMachine must be running." if ! EM.reactor_running?
+      @timer = EM.add_periodic_timer( @read_socket_interval ) do
+        begin
+          data = read_data
+          receive_data( data ) unless data.empty?
+        rescue => err
+          log.error "in read timer : #{err}\n" + err.backtrace[0..5].join("\n")
+        end
+      end
+    end
+
+    def _stop_timer
+      @timer.cancel if @timer
+      @timer = nil
     end
   end # class Client
 end # module Stratum

@@ -55,4 +55,3 @@ gem "mocha"
 gem 'log4r'
 gem 'nokogiri'
 gem 'mechanize'
-gem 'octave-ruby'

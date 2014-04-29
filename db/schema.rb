@@ -67,17 +67,17 @@ ActiveRecord::Schema.define(version: 20140428163357) do
   add_index "payouts", ["transaction_id"], name: "index_payouts_on_transaction_id"
 
   create_table "shares", force: true do |t|
-    t.integer  "worker_id",                                       null: false
-    t.string   "solution",    limit: 64,                          null: false
-    t.float    "difficulty",                                      null: false
-    t.boolean  "our_result",                                      null: false
+    t.integer  "worker_id",              null: false
+    t.string   "pool",        limit: 64, null: false
+    t.string   "solution",    limit: 64, null: false
+    t.float    "difficulty",             null: false
+    t.boolean  "our_result",             null: false
     t.boolean  "pool_result"
     t.string   "reason"
-    t.boolean  "is_block",                                        null: false
+    t.boolean  "is_block",               null: false
+    t.integer  "payout_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "payout_id"
-    t.string   "pool",        limit: 64, default: "CleverMining", null: false
   end
 
   add_index "shares", ["payout_id"], name: "index_shares_on_payout_id"
@@ -98,14 +98,14 @@ ActiveRecord::Schema.define(version: 20140428163357) do
     t.string   "name",           limit: 64
     t.string   "password",       limit: 64
     t.string   "email"
-    t.string   "payout_address", limit: 34,                                          null: false
-    t.boolean  "is_anonymous",                                                       null: false
-    t.boolean  "is_admin",                                                           null: false
+    t.string   "payout_address", limit: 34,                                      null: false
+    t.boolean  "is_anonymous",                                                   null: false
+    t.boolean  "is_admin",                                                       null: false
+    t.integer  "balance",                                            default: 0
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "balance",                                            default: 0
     t.string   "wallet_address", limit: 34
-    t.decimal  "min_price",                 precision: 16, scale: 8, default: 0.001, null: false
+    t.decimal  "min_price",                 precision: 16, scale: 8
   end
 
   create_table "workers", force: true do |t|

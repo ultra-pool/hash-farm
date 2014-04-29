@@ -9,5 +9,12 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
+ *= require metronic/bootstrap.min
+ *= require metronic/uniform.default
+ *= require metronic/style-metronic
+ *= require metronic/style
+ *= require metronic/style-responsive
+ *= require metronic/plugins
+ *= require metronic/default
  *= require_tree .
  */

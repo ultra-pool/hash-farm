@@ -55,19 +55,24 @@ class MainServer < Stratum::Server
   end
 
   def start
-    log.info "Starting CommandServer..."
-    cs_conf = ProfitMining.config.command_server
-    @command_server = EM.start_server( cs_conf.host, cs_conf.port, PM::CommandServer )
-    log.info "CommandServer started on #{cs_conf.host}:#{cs_conf.port}"
-
     @pools.each(&:start)
     super
+    EM.next_tick do
+      log.info "Starting CommandServer..."
+      cs_conf = ProfitMining.config.command_server
+      @command_server = EM.start_server( cs_conf.host, cs_conf.port, PM::CommandServer )
+      log.info "CommandServer started on #{cs_conf.host}:#{cs_conf.port}"
+    end
   end
 
   # => self
   def stop
-    EM.stop_server @command_server
+    EM.next_tick do
+      EM.stop_server( @command_server )
+      log.info "CommandServer stopped."
+    end
     super
+    @pools.each(&:stop)
   end
 
   # => pool

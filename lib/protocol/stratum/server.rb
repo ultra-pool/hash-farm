@@ -110,9 +110,12 @@ module Stratum
     # Look at Server.start_reactor.
     def start
       init_event_machine unless EM.reactor_running?
-      @server_signature = EventMachine.start_server( host, port, @handler )
-
-      Server.log.info "Started Stratum::Server on #{host}:#{port}..."
+      EM.next_tick do
+        @server_signature = EventMachine.start_server( host, port, @handler )
+        Server.log.info "Started Stratum::Server on #{host}:#{port}..."
+        @started = true
+        emit( 'start' )
+      end
 
       Stratum::Handler.on( 'connect' ) do |cxn|
         next unless cxn.kind_of?( @handler )
@@ -126,9 +129,6 @@ module Stratum
         emit('disconnect', cxn)
         cxn.off(self)
       end
-
-      @started = true
-      emit( 'start' )
       self
     end
 

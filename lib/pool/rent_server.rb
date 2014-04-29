@@ -67,6 +67,7 @@ class RentServer < MainServer
   def add_rent_from_proxy_pool( name )
     p = MulticoinPool[name]
     order = Order.new(user_id: 1, url: p.url, username: p.account, password: p.password || 'x', pay: Order::PAY_MIN, price: Order::PRICE_MIN)
+    order.instance_variable_set( :@hash_to_do, Float::INFINITY )
     add_rent_pool( order )
   rescue => err
     puts err, err.backtrace[0...5].join("\n")

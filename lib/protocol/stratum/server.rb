@@ -105,7 +105,6 @@ module Stratum
       end
     end
 
-
     # EM reactor MUST be started.
     # Look at Server.start_reactor.
     def start

@@ -113,11 +113,21 @@ class RentServer < MainServer
   # Put all workers in most profitable pool, in pool limits, older first in case of equality.
   def fill_most_profitable_first
     rsorted_pools = @pools.sort.reverse
+    to_move_workers = []
     rsorted_pools.each_with_index do |pool,i|
       missing_hashrate = pool.max_hashrate - pool.hashrate
-      res = get_workers( rsorted_pools[i+1..-1], missing_hashrate )
-      log.info "[#{pool.name}] can add #{missing_hashrate} MH, got #{res.last} MH for #{res.first.size} workers"
-      res.first.each do |w| w.pool = pool end
+      if missing_hashrate > 0 && ! to_move_workers.empty?
+        to_move_workers.each do |w| w.pool = pool end
+        to_move_workers.clear
+        redo
+      elsif missing_hashrate > 0
+        res = get_workers( rsorted_pools[i+1..-1], missing_hashrate )
+        log.info "[#{pool.name}] can add #{missing_hashrate.to_f / 10**6} MH, got #{res.last.to_f / 10**6} MH for #{res.first.size} workers"
+        res.first.each do |w| w.pool = pool end
+      else
+        res = get_workers_from( pool, -missing_hashrate )
+        to_move_workers += res.first
+      end
     end
   end
 

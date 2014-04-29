@@ -25,8 +25,8 @@ class RentPool < ProxyPool
     raise "Cannot start a pool with done order." if order.done?
     super( order.uri, name: order.pool_name )
     @order = order
-    @max_hashrate = order.limit
-    log.info "[#{name}] max_hashrate=#{@max_hashrate}, hash_to_do=#{(@order.hash_to_do * 10**-9).to_f} GH, prof=#{order.price}"
+    @max_hashrate = order.limit * 10**6
+    log.info "[#{name}] max_hashrate=#{order.limit}, hash_to_do=#{(@order.hash_to_do * 10**-9).to_f} GH, prof=#{order.price}"
   end
 
   def start

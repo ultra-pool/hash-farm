@@ -217,14 +217,14 @@ class ProxyPool < Pool
 
     share
   rescue ArgumentError => err
-    ProxyPool.log.warn "[#{worker.name}] Fail on submit : #{err}"
-    req.respond( false ) && nil
+    ProxyPool.log.warn "[#{worker.name}] Fail on submit : #{err}\n" + err.backtrace[0...5].join("\n")
+    nil
   rescue => err
     ProxyPool.log.error err
     ProxyPool.log.error err.backtrace[0..5].join("\n")
     ProxyPool.log.error "worker=#{worker.inspect}"
     ProxyPool.log.error "share=#{share.inspect}"
-    req.respond( false ) && nil
+    nil
   end
 
   ##########################################################

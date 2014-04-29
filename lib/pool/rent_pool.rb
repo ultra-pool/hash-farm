@@ -26,7 +26,7 @@ class RentPool < ProxyPool
     super( order.uri, name: order.pool_name )
     @order = order
     @max_hashrate = order.limit
-    log.info "[#{name}] max_hashrate=#{@max_hashrate}, hash_to_do=#{@order.hash_to_do * 10**-9}, prof=#{order.price}"
+    log.info "[#{name}] max_hashrate=#{@max_hashrate}, hash_to_do=#{(@order.hash_to_do * 10**-9).to_f} GH, prof=#{order.price}"
   end
 
   def start

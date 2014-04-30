@@ -14,7 +14,11 @@
   <%= csrf_meta_tags %>
   <link rel="shortcut icon" href="favicon.ico" />
 </head>
-<body class="page-header-fixed">
+<% if controller.action_name.eql?('promo') %>
+  <body class="page-header-fixed page-full-width">
+<% else %>
+  <body class="page-header-fixed">
+<% end %>
 
 <%= render "widgets/header" %>
 

@@ -3,7 +3,6 @@
 <table>
   <thead>
     <tr>
-      <th>Coin</th>
       <th>Raw</th>
       <th>Txid</th>
       <th>Ourid</th>
@@ -17,7 +16,6 @@
   <tbody>
     <% @transactions.each do |transaction| %>
       <tr>
-        <td><%= transaction.coin %></td>
         <td><%= transaction.raw %></td>
         <td><%= transaction.txid %></td>
         <td><%= transaction.ourid %></td>

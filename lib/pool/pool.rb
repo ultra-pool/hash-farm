@@ -160,7 +160,7 @@ class Pool
 
     if @workers.size == 0
       emit( "empty" )
-    elsif self.hashrate < ProfitMining.config.min_pool_hashrate
+    elsif self.hashrate < HashFarm.config.min_pool_hashrate
       emit( "low_hashrate" )
     end
   end

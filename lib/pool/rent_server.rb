@@ -9,7 +9,6 @@ class RentServer < MainServer
   CHECK_ORDERS_POOL_EVERY = 1.minute
 
   def init_pools
-    # add_rent_from_proxy_pool( @config.proxy_pools.first )
     log.verbose "#{@pools.size} rent_pools created."
   end
 
@@ -29,7 +28,7 @@ class RentServer < MainServer
   def check_orders
     rsorted_pools = @pools.sort.reverse
     available_pool_hashrate = rsorted_pools.map { |pool| (pool.max_hashrate || self.hashrate*2) - pool.hashrate }.sum
-    waiting_orders = Order.non_complete.waiting.sort - rsorted_pools.map(&:order) # if any not started yet
+    waiting_orders = Order.uncomplete.waiting.sort - rsorted_pools.map(&:order) # if any not started yet
     return if waiting_orders.empty?
     best_waiting_price = waiting_orders.last.price
     # If there is an order more profitable than the worst pool launched
@@ -60,15 +59,6 @@ class RentServer < MainServer
 
   def delete_rent_pool( pool )
     delete_pool( pool )
-  end
-
-  def add_rent_from_proxy_pool( name )
-    p = MulticoinPool[name]
-    order = Order.new(user_id: 1, url: p.url, username: p.account, password: p.password || 'x', pay: Order::PAY_MAX, price: Order::PRICE_MIN)
-    add_rent_pool( order )
-  rescue => err
-    log.error "#{err}\n" + err.backtrace[0...5].join("\n")
-    nil
   end
 
 

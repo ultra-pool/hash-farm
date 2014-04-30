@@ -4,7 +4,6 @@ require 'bitcoin'
 require 'singleton'
 require "protocol/stratum"
 require "command_server"
-require "multicoin_pools/pool_picker"
 
 require_relative './proxy_pool'
 require_relative './rent_pool'
@@ -31,7 +30,7 @@ class MainServer < Stratum::Server
   attr_reader :pools, :current_pool
 
   def initialize
-    @config = ProfitMining.config.main_server
+    @config = HashFarm.config.main_server
     super( @config.host, @config.port )
     @handler = WorkerConnection
     @pools = []
@@ -59,7 +58,7 @@ class MainServer < Stratum::Server
     super
     EM.next_tick do
       MainServer.log.info "Starting CommandServer..."
-      cs_conf = ProfitMining.config.command_server
+      cs_conf = HashFarm.config.command_server
       @command_server = EM.start_server( cs_conf.host, cs_conf.port, PM::CommandServer )
       MainServer.log.info "CommandServer started on #{cs_conf.host}:#{cs_conf.port}"
     end

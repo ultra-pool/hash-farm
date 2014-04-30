@@ -1,10 +1,10 @@
 require 'rubygems'
 require 'rake'
 
-desc "ProfitMining Multicoin pool admin"
+desc "HashFarm Multicoin pool admin"
 namespace :profit_mining do
 
-  desc "Start a ProfitMining instance."
+  desc "Start a HashFarm instance."
   task :start => :environment do |t|
     require 'pool/main_server'
     require 'command_server'
@@ -13,11 +13,11 @@ namespace :profit_mining do
     pm_server.start
 
     Signal.trap("TERM") do
-      puts "'TERM' signal received. Going to shutdown ProfitMining..."
+      puts "'TERM' signal received. Going to shutdown HashFarm..."
       EM.add_timer(0) { pm_server.stop; EM.stop }
     end
     Signal.trap("INT") do
-      puts "'INT' signal received. Going to shutdown ProfitMining..."
+      puts "'INT' signal received. Going to shutdown HashFarm..."
       EM.add_timer(0) { pm_server.stop; EM.stop }
     end
 
@@ -25,7 +25,7 @@ namespace :profit_mining do
   end # task :start
 
   namespace :block do
-  desc "Start a ProfitMining instance."
+  desc "Start a HashFarm instance."
     task :notify => :environment do |t|
       coin_code, hash = *ARGV[1..2]
       # 

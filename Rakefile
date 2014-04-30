@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-ProfitMining::Application.load_tasks
+HashFarm::Application.load_tasks

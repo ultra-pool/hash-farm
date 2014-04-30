@@ -4,7 +4,6 @@ require 'open-uri'
 require 'nokogiri'
 require 'core_extensions'
 require "protocol/stratum"
-require "multicoin_pool"
 
 require_relative './pool'
 require_relative './worker_connection'
@@ -235,10 +234,7 @@ class ProxyPool < Pool
   def compute_diff( worker )
     [super, @next_diff].min
   end
-
-  def profitability
-    self.authentified ? super : 0.0
-  end
+  
   # def shares( since=Time.now-1.hour, untl=now )
   #   Share.where( pool: @name, pool_result: true ).where( ["created_at > ? AND created_at <= ?", since, untl] )
   # end

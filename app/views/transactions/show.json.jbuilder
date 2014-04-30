@@ -1,1 +1,1 @@
-json.extract! @transaction, :id, :coin_id, :raw, :txid, :ourid, :block, :created_at, :updated_at
+json.extract! @transaction, :id, :raw, :txid, :ourid, :block, :created_at, :updated_at

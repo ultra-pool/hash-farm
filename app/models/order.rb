@@ -21,6 +21,15 @@ class Order < ActiveRecord::Base
   # Booleans :
   # attr_accessible :running, :complete
   
+  before_validation do
+    if self.username.blank?
+      uri = URI(self.url)
+      self.username = uri.user
+      self.password = uri.password if self.password.empty?
+    end
+    self.username
+  end
+
   validates :pay, numericality: { greater_than_or_equal_to: PAY_MIN }
   validates :pay, numericality: { less_than_or_equal_to: PAY_MAX }
   validates :price, numericality: { greater_than_or_equal_to: PRICE_MIN }
@@ -29,7 +38,7 @@ class Order < ActiveRecord::Base
   scope :waiting, -> { where( running: false ) }
   scope :running, -> { where( running: true ) }
   scope :complete, -> { where( complete: true ) }
-  scope :non_complete, -> { where( complete: false ) }
+  scope :uncomplete, -> { where( complete: false ) }
 
   def uri() @uri = URI( self.url ); @uri.user = self.username; @uri.password = self.password; @uri end
   def host() uri.host end

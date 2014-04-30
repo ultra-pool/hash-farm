@@ -19,9 +19,8 @@ class Payout < ActiveRecord::Base
   # Je récupère
   def self.run
     @@mutex.synchronize do
-      accounts = Account.where( coin_id: Coin.find_by(code: 'BTC'), label: ["pool", "rent", "blocks", "balances"] ).to_a
       shares = Share.unpaid.accepted.to_a
-      payout = Payout.new( accounts, shares )
+      payout = Payout.new( shares )
       payout.send_it!
       payout
     end
@@ -49,26 +48,18 @@ class Payout < ActiveRecord::Base
 
   # Payout.new( accounts_ary, shares_ary )
   def initialize(*args, **kargs)
-    objArg = OpenStruct.new(**kargs)
     @users_sum_crumbs = 0
     
-    coin = objArg.delete(:coin) || Coin["BTC"]
-    rpc = objArg.delete(:rpc) || coin.rpc
-
     # at least one Account in inputs, and outputs are all Shares.
-    return super( *args, **objArg.to_h ) unless args.size == 2
-    raise unless args.all? { |arg| arg.kind_of?(Array) }
-    raise unless args[0].all? { |arg| arg.kind_of?( Account ) }
-    raise unless args[1].all? { |arg| arg.kind_of?( Share ) }
+    if args.size == 1 && args.first.kind_of?(Array) &&  args.first.all? { |arg| arg.kind_of?( Share ) }
+      shares = args.first
+      super( *args, **kargs )
+    else
+      return super( *args, **kargs )
+    end
 
-    accounts, shares = *args.shift(2)
+    self.transaction = Transaction.new
 
-    super( *args, **objArg.to_h )
-
-    self.transaction = Transaction.new( coin: coin, rpc: rpc )
-
-    # Retrieve unspent transactions and add them to inputs
-    init_inputs( accounts )
     # Compute what go to us, miner and users.
     @miner_fees, self.our_fees, self.users_amount = *compute_fees
     # 
@@ -100,12 +91,7 @@ class Payout < ActiveRecord::Base
   end
 
   private
-    def init_inputs( accounts )
-      accounts.each do |account|
-        account.listunspent.each do |t|
-          self.tx.add_input( t.txid, t.vout, t.amount )
-        end
-      end
+    def init_inputs( orders )
     end
 
     def compute_fees
@@ -149,17 +135,17 @@ class Payout < ActiveRecord::Base
       # Add Fees
       self.users_amount -= @users_sum_crumbs
       self.our_fees += @users_sum_crumbs
-      tx.add_output( Account.find_by(label: "fees"), self.our_fees )
+      # tx.add_output( Account.find_by(label: "fees"), self.our_fees )
 
       # Balance
       balances_in_sum = res.inject(0) { |r, t| t[3] > 0 ? r + t[3] : r }
       balances_out_sum = res.inject(0) { |r, t| t[3] > 0 ? r : (r - t[3]) }
       new_balance = res.map { |t| t[3] }.sum
       raise "difference in balance sum : #{new_balance} != #{balances_in_sum} - #{balances_out_sum}" if new_balance != balances_in_sum - balances_out_sum
-      balances_account = Account.find_by(label: "balances")
-      final_balance = balances_account.balance + balances_in_sum - balances_out_sum
-      raise "final_balance too low : #{final_balance}" if final_balance < 0
-      tx.add_output( balances_account, final_balance ) if final_balance != 0
+      # balances_account = Account.find_by(label: "balances")
+      # final_balance = balances_account.balance + balances_in_sum - balances_out_sum
+      # raise "final_balance too low : #{final_balance}" if final_balance < 0
+      # tx.add_output( balances_account, final_balance ) if final_balance != 0
 
       return {
         balance: {

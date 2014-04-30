@@ -44,6 +44,8 @@ class RentPool < ProxyPool
     share = super
     return nil if share.nil?
 
+    share.order = order
+    share.save!
     if share.valid_share? && @order.price > Order::PRICE_MIN # TODO: remove last test. For debug purpose
       order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
       order.save!

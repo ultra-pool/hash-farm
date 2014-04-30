@@ -7,7 +7,7 @@ require 'log4r/configurator'
 Log4r::Configurator.custom_levels( "DEBUG", "VERBOSE", "INFO", "WARN", "ERROR" )
 
 module Loggable
-  DEFAULT_STDOUT_LEVEL = Log4r::INFO
+  DEFAULT_STDOUT_LEVEL = Log4r::VERBOSE
   PATTERN = Log4r::PatternFormatter.new( pattern: "[%d][%l][%c] %m", date_pattern: "%T" )
 
   def Loggable.included( aMod )

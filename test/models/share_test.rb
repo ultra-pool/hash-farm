@@ -112,6 +112,7 @@ class ShareTest < ActiveSupport::TestCase
 
   test "it should be a valid share" do
     assert @share.our_result
+    @share.order = Order.new
     assert @share.valid?
   end
 

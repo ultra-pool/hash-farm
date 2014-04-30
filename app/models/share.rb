@@ -8,7 +8,10 @@ require 'mining_helper'
 class Share < ActiveRecord::Base
   belongs_to :worker
   belongs_to :payout
+  belongs_to :order
   has_one :user, through: :worker
+  
+  validates :order, presence: true
 
   scope :unpaid, -> { where(payout_id: nil) }
   scope :accepted, -> { where(our_result: true) }

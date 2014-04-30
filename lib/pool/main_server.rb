@@ -77,15 +77,19 @@ class MainServer < Stratum::Server
   # => pool
   def add_pool( pool )
     pool.on( 'error' ) do |error|
-      MainServer.log.error( "#{pool.name} : #{error}" )
+      MainServer.log.error "#{pool.name} : #{error}" 
       emit( 'error', pool.name, error )
     end
+    pool.on( 'stopped' ) do delete_pool( pool ) end
     @pools << pool
     if self.started?
       pool.start
       pool.on('started') do balance_workers end
     end
     pool
+  rescue => err
+    MainServer.log.error "in add_pool : #{err}"
+    MainServer.log.error err.backtrace.join("\n")
   end
   
   def delete_pool( pool )
@@ -113,7 +117,7 @@ class MainServer < Stratum::Server
   end
 
   def on_authorize worker, req
-    MainServer.log.info("authorizing #{req.params[0]}")
+    MainServer.log.info "authorizing #{req.params[0]}"
     username, _ = *req.params
     payout_address, worker_name = username.split('.')
     return req.respond( false ) if ! Bitcoin.valid_address?( payout_address )
@@ -181,7 +185,7 @@ class MainServer < Stratum::Server
       next_pool_idx = @pools.index( @current_pool ) + 1
       next_pool_idx %= @pools.size
     end
-    MainServer.log.info("Going to switch to pool n°#{next_pool_idx+1}/#{@pools.size}")
+    MainServer.log.info "Going to switch to pool n°#{next_pool_idx+1}/#{@pools.size}"
 
     self.current_pool = @pools[next_pool_idx]
     # EM.add_timer( 4.days ) do switch_to_next_pool end
@@ -198,7 +202,7 @@ class MainServer < Stratum::Server
     elsif @current_pool
       MainServer.log.info "Change current pool from #{@current_pool.name} to nil"
     elsif pool
-      MainServer.log.info("Change current pool to #{pool.name}")
+      MainServer.log.info "Change current pool to #{pool.name}"
     end
 
     @current_pool = pool
@@ -211,7 +215,7 @@ class MainServer < Stratum::Server
 
   def move_all_workers( pool=@current_pool )
     raise "pool must be a Pool, not a #{pool.class}" if ! pool.kind_of?( Pool )
-    MainServer.log.info("Move all workers to #{pool.name}")
+    MainServer.log.info "Move all workers to #{pool.name}"
     workers.each do |w| w.pool = pool end
   end
 

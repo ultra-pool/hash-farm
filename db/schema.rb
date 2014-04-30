@@ -78,8 +78,12 @@ ActiveRecord::Schema.define(version: 20140430142446) do
     t.integer  "payout_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "payout_id"
+    t.string   "pool",        limit: 64, default: "CleverMining", null: false
+    t.integer  "order_id"
   end
 
+  add_index "shares", ["order_id"], name: "index_shares_on_order_id"
   add_index "shares", ["payout_id"], name: "index_shares_on_payout_id"
 
   create_table "transactions", force: true do |t|

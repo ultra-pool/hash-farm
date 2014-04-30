@@ -148,11 +148,11 @@ module Stratum
     # private
 
     def _connect( host, port )
-      log.verbose "Connecting to #{host}:#{port}..."
+      log.info "Connecting to #{host}:#{port}..."
       @socket = TCPSocket.new( host, port )
       _, @rport, _, @rip = @socket.peeraddr
     rescue => err
-      log.error err, err.backtrace[0...5].join("\n")
+      log.error "Fail to connect to #{@host}:#{@port} : #{err}\n" + err.backtrace[0...5].join("\n")
       # Reraise if we were already on backup or if there is no backup.
       raise if host != @host || port != @port || @back_uri.nil?
       

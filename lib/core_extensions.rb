@@ -9,6 +9,14 @@
   end
   
   class Numeric
+    # Always return a float, handle INFINITY
+    def fround(precision=0)
+      return self if self == Float::INFINITY
+      r = self.round(precision)
+      r = r.to_f if r.kind_of?( Integer )
+      r
+    end
+
     def satoshi
       self.round
     end

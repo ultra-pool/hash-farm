@@ -24,6 +24,17 @@ class CoreExtensionsTest < ActiveSupport::TestCase
     refute "false".boolean?
   end
 
+  test "numeric should fround" do
+    assert_same 158.0, 158.fround
+    assert_same 158.0, 158.fround(0)
+    assert_same 158.0, 158.fround(1)
+    assert_same 160.0, 158.fround(-1)
+    
+    assert_same Float::INFINITY, Float::INFINITY.fround
+    assert_same Float::INFINITY, Float::INFINITY.fround(-1)
+    assert_same Float::INFINITY, Float::INFINITY.fround(1)
+  end
+
   test "numeric should include btc units" do
     assert_same 1, 1.satoshi
     assert_same 100, 1.ubtc

@@ -21,8 +21,8 @@ module PM
           when "stop"
             CommandServer.log.info "'stop' request received. Going to shutdown ProfitMining...";
             req.respond( true )
+            @ms.on('stopped') do EM.stop_event_loop end
             @ms.stop
-            EM.stop
           when "stats"
             req.respond( stats )
           when "jstats"
@@ -58,8 +58,12 @@ module PM
             prev_hashrate = [@ms.hashrate * 10**-6, limit || Float::INFINITY].min
             puts "New RentPool @#{name} for ~#{pay / price * 1.day / prev_hashrate} s at #{prev_hashrate} MHs"
             order = Order.new(user_id: 1, url: url, username: username, password: password, pay: pay, price: price, limit: limit)
-            @ms.add_rent_pool( order )
-            req.respond true
+            if order.valid?
+              @ms.add_rent_pool( order )
+              req.respond true
+            else
+              req.respond false
+            end
           when "reload"
             Dir["lib/*.rb"].each { |f|
               next if f =~ /market\.rb$/

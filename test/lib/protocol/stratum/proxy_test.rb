@@ -27,8 +27,8 @@ class Stratum::ProxyTest < ActiveSupport::TestCase
     t = 0
     started, stopped = false, false
 
-    proxy.on( 'start' ) do started = true end
-    proxy.on( 'stop' ) do stopped = true end
+    proxy.on( 'started' ) do started = true end
+    proxy.on( 'stopped' ) do stopped = true end
 
     EM.next_tick do proxy.start end
     EM.add_timer( 0.01 ) do proxy.stop end

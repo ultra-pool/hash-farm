@@ -24,6 +24,39 @@ class CoreExtensionsTest < ActiveSupport::TestCase
     refute "false".boolean?
   end
 
+  test "numeric should fround" do
+    assert_same 158.0, 158.fround
+    assert_same 158.0, 158.fround(0)
+    assert_same 158.0, 158.fround(1)
+    assert_same 160.0, 158.fround(-1)
+    
+    assert_same Float::INFINITY, Float::INFINITY.fround
+    assert_same Float::INFINITY, Float::INFINITY.fround(-1)
+    assert_same Float::INFINITY, Float::INFINITY.fround(1)
+  end
+
+  test "numeric should include btc units" do
+    assert_same 1, 1.satoshi
+    assert_same 100, 1.ubtc
+    assert_same 100, 1.µbtc
+    assert_same 100000, 1.mbtc
+    assert_same 100000000, 1.btc
+
+    assert_same 1, 1.2.satoshi
+    assert_same 120, 1.2.ubtc
+    assert_same 123, 1.234.ubtc
+    assert_same 124, 1.236.ubtc
+    assert_same 120, 1.2.µbtc
+    assert_same 123000, 1.23.mbtc
+    assert_same 123000000, 1.23.btc
+  end
+
+  test "numeric should include hash units" do
+    assert_same 10**3, 1.khash
+    assert_same 10**6, 1.mhash
+    assert_same 10**9, 1.ghash
+  end
+
   test "integer should include to_hex" do
     # refute Integer.instance_methods.include?( :to_hex )
     # using CoreExtensions
@@ -69,6 +102,12 @@ class CoreExtensionsTest < ActiveSupport::TestCase
         assert_equal n, n.to_hex(b).hex
       end
     end
+  end
+
+  test "integer should include hash units" do
+    assert_same 12.3, 12345.to_khash
+    assert_same 1.5, 1500000.to_mhash
+    assert_same 123.5, 123450000000.to_ghash
   end
 
   test "string should include reverse_hex" do

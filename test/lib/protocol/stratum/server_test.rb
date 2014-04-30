@@ -11,7 +11,7 @@ class Stratum::ServerTest < ActiveSupport::TestCase
     get_em_mutex()
   end
   teardown do
-    EM.stop
+    EM.next_tick { EM.stop_event_loop }
   end
 
   def test_connection
@@ -21,8 +21,8 @@ class Stratum::ServerTest < ActiveSupport::TestCase
     start_called = stop_called = false
     connect_called = disconnect_called = false
 
-    server.on( 'start' ) do start_called = true end
-    server.on( 'stop' ) do stop_called = true end
+    server.on( 'started' ) do start_called = true end
+    server.on( 'stopped' ) do stop_called = true end
     server.on( 'connect' ) do |cxn| connect_called = true end
     server.on( 'disconnect' ) do disconnect_called = true end
 

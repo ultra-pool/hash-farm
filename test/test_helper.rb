@@ -36,8 +36,3 @@ EM.error_handler do |err|
   puts "Error in EM: #{err}"
   puts err.backtrace.join("\n")
 end
-
-# Check if bitcoind -testnet is started
-@testnet_ctrl = RpcController.new( "Bitcoin", "http://barbu:toto@localhost:18332", true )
-raise "Bitcoin testnet not started" unless @testnet_ctrl.started?
-raise "Bitcoin testnet not sync" unless @testnet_ctrl.sync?

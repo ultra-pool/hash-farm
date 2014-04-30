@@ -1,7 +1,6 @@
 
 require 'socket'
 require 'protocol/rpc/handler'
-require_relative 'multicoin_pool'
 
 module PM
   module CommandServer
@@ -19,10 +18,10 @@ module PM
           method = req.method.split('.')
           case method.first
           when "stop"
-            CommandServer.log.info "'stop' request received. Going to shutdown ProfitMining...";
+            CommandServer.log.info "'stop' request received. Going to shutdown HashFarm...";
             req.respond( true )
+            @ms.on('stopped') do EM.stop_event_loop end
             @ms.stop
-            EM.stop
           when "stats"
             req.respond( stats )
           when "jstats"
@@ -40,26 +39,19 @@ module PM
           when "add_fake_rent_pool"
             raise "Command available only with RentServer, not #{@ms.class}" unless @ms.kind_of?( RentServer )
 
-            if (Integer(req.params.first) rescue nil)
-              name = ProfitMining.config.main_server.proxy_pools[ req.params.first.to_i ]
-              mp = MulticoinPool[name]
-              url, username, password = mp.url, mp.account, mp.password || 'x'
-            elsif req.params.first.kind_of?( String )
-              uri = URI( req.params.first )
-              username, password, uri.user, uri.password = uri.user, uri.password, nil, nil
-              url = uri.to_s
-            else
-              raise "Invalid arg : #{req.params.first}"
-            end
-
+            url = req.params.first
             pay = Float( req.params[1] ) rescue Order::PAY_MIN
             price = Float( req.params[2] ) rescue 0.001
             limit = Float( req.params[3] ) rescue nil
             prev_hashrate = [@ms.hashrate * 10**-6, limit || Float::INFINITY].min
-            puts "New RentPool @#{name} for ~#{pay / price * 1.day / prev_hashrate} s at #{prev_hashrate} MHs"
+            puts "New RentPool @#{name} for ~#{(pay / price * 1.day / prev_hashrate).round} s at #{prev_hashrate} MHs"
             order = Order.new(user_id: 1, url: url, username: username, password: password, pay: pay, price: price, limit: limit)
-            @ms.add_rent_pool( order )
-            req.respond true
+            if order.valid?
+              @ms.add_rent_pool( order )
+              req.respond true
+            else
+              req.respond false
+            end
           when "reload"
             Dir["lib/*.rb"].each { |f|
               next if f =~ /market\.rb$/
@@ -101,7 +93,7 @@ module PM
 
     def stats
       s = StringIO.new
-      s.puts "ProfitMining :"
+      s.puts "HashFarm :"
       s.puts "- %d workers, %.1f MH/s, %.1f %% rejected" % [@ms.workers.size, @ms.hashrate * 10**-6, @ms.hashrate > 0 ? @ms.rejected_hashrate.to_f / @ms.hashrate : 0]
       # @ms.balances.each do |name, b|
       #   s.puts "#{b} #{name},"

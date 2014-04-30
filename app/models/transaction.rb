@@ -8,8 +8,6 @@ require 'loggable'
 class Transaction < ActiveRecord::Base
   include Loggable
 
-  belongs_to :coin
-
   attr_reader :inputs, :outputs
   # You can't modify a Transaction, you must create it with new and call send_it!
   #protected :save, :save! , :create, :create!, :update, :update!
@@ -24,15 +22,12 @@ class Transaction < ActiveRecord::Base
 
   def initialize( *args, **kargs )
     objArg = OpenStruct.new(**kargs)
-    raise "You must init with a coin" if ! objArg.coin && ! objArg.coin_id
     @inputs = objArg.delete(:inputs) || []
     @outputs = objArg.delete(:outputs) || {}
     @outputs.default = 0
     @rpc = objArg.delete(:rpc)
 
     super( *args, **objArg.to_h )
-
-    @rpc ||= coin.rpc
   end
 
   # 
@@ -53,7 +48,6 @@ class Transaction < ActiveRecord::Base
   # amount is in Satoshi.
   def add_output( output_address, amount )
     output_address = output_address.payout_address if output_address.kind_of?( User )
-    output_address = output_address.address if output_address.kind_of?( Account )
     @outputs[output_address] += amount.to_i
   end
 
@@ -122,11 +116,11 @@ class Transaction < ActiveRecord::Base
     infos
   end
 
-  def mature?( miniconf=coin.transaction_confirmation )
+  def mature?( miniconf=6 )
     get_info["confirmations"] >= miniconf
   end
 
-  def immature?( miniconf=coin.transaction_confirmation )
+  def immature?( miniconf=6 )
     ! mature?( miniconf )
   end
 

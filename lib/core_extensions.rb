@@ -8,6 +8,45 @@
     end
   end
   
+  class Numeric
+    # Always return a float, handle INFINITY
+    def fround(precision=0)
+      return self if self == Float::INFINITY
+      r = self.round(precision)
+      r = r.to_f if r.kind_of?( Integer )
+      r
+    end
+
+    def satoshi
+      self.round
+    end
+
+    def ubtc
+      (self * 10**2).round
+    end
+    alias_method :µbtc, :ubtc
+
+    def mbtc
+      (self * 10**5).round
+    end
+
+    def btc
+      (self * 10**8).round
+    end
+
+    def khash
+      (self * 10**3).round
+    end
+
+    def mhash
+      (self * 10**6).round
+    end
+
+    def ghash
+      (self * 10**9).round
+    end
+  end
+
   # refine Integer do
   class Integer
     # intN.to_hex.hex => intN
@@ -23,6 +62,18 @@
       s = "%0#{nb_byte*2}x" % self
       s = (s.size.odd? ? '0' : '') + s
       s
+    end
+
+    def to_khash( precision=1 )
+      (to_f / 10**3).round( precision )
+    end
+
+    def to_mhash( precision=1 )
+      (to_f / 10**6).round( precision )
+    end
+
+    def to_ghash( precision=1 )
+      (to_f / 10**9).round( precision )
     end
   end
 

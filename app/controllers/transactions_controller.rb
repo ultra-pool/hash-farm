@@ -69,6 +69,6 @@ class TransactionsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def transaction_params
-      params.require(:transaction).permit(:coin_id, :raw, :txid, :ourid, :block)
+      params.require(:transaction).permit(:raw, :txid, :ourid, :block)
     end
 end

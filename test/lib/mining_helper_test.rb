@@ -115,7 +115,7 @@ class MiningHelperTest < ActiveSupport::TestCase
   end
 
   test "it should compute nb_hash from difficulty" do
-    assert_equal 2**48 / 0x00ffff, Sha256CoinHelper.difficulty_to_nb_hash( 1.0 )
+    assert_equal 2**48 / 0x00ffff, MiningHelper.difficulty_to_nb_hash( 1.0 )
   end
 
   test "it should parse parse_address" do

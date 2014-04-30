@@ -21,6 +21,15 @@ class Order < ActiveRecord::Base
   # Booleans :
   # attr_accessible :running, :complete
   
+  before_validation do
+    if self.username.blank?
+      uri = URI(self.url)
+      self.username = uri.user
+      self.password = uri.password if self.password.empty?
+    end
+    self.username
+  end
+
   validates :pay, numericality: { greater_than_or_equal_to: PAY_MIN }
   validates :pay, numericality: { less_than_or_equal_to: PAY_MAX }
   validates :price, numericality: { greater_than_or_equal_to: PRICE_MIN }
@@ -29,38 +38,25 @@ class Order < ActiveRecord::Base
   scope :waiting, -> { where( running: false ) }
   scope :running, -> { where( running: true ) }
   scope :complete, -> { where( complete: true ) }
-  scope :non_complete, -> { where( complete: false ) }
+  scope :uncomplete, -> { where( complete: false ) }
 
-  attr_reader :uri, :host, :port, :pool_name
-  attr_reader :hash_to_do # => int
+  def uri() @uri = URI( self.url ); @uri.user = self.username; @uri.password = self.password; @uri end
+  def host() uri.host end
+  def port() uri.port end
+  def hash_to_do() (self.pay / self.price * 10**6 * 1.day).round - self.hash_done end
+  def pool_name() "order##{self.id}@#{host}" end
 
-  def initialize(*)
-    super
-    self.created_at = Time.now
-    @uri = URI( self.url )
-    @uri.user = self.username
-    @uri.password = self.password
-    @host, @port = @uri.host, @uri.port
-    @hash_to_do = self.price > 0 && self.pay > 0 ? (self.pay / self.price * 10**6 * 1.day).round : Float::INFINITY
-    @pool_name = "order##{self.id}@#{host}"
+  after_initialize do |order|
+    self.created_at ||= Time.now
+    self.hash_done ||= 0
   end
 
-  # Convert nil to Float::INFINITY
-  # => mhs
-  def limit
-    lim = read_attribute(:limit)
-    lim.nil? ? Float::INFINITY : lim
-  end
-
-  # Convert Float::INFINITY to nil
-  # => limit
-  def limit=( lim )
-    write_attribute(:limit, lim == Float::INFINITY ? nil : lim )
-    lim
+  def limited?
+    ! self.limit.nil?
   end
 
   def pool
-    Pool[@pool_name] || RentPool.new( self )
+    Pool[pool_name] || RentPool.new( self )
   end
 
   def <=>( o )
@@ -70,7 +66,11 @@ class Order < ActiveRecord::Base
   end
 
   def complete?
-    self.complete || self.hash_done > @hash_to_do
+    self.complete || self.hash_done > hash_to_do
+  rescue => err
+    p [self.complete, self.hash_done, hash_to_do]
+    puts "#{err}\n" + err.backtrace.join("\n")
+    false
   end
   alias_method :done?, :complete?
 

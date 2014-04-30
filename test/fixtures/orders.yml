@@ -1,7 +1,7 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  user_id: 
+  user_id: barbu
   algo: MyString
   url: MyString
   username: MyString
@@ -14,7 +14,7 @@ one:
   running: false
 
 two:
-  user_id: 
+  user_id: barbu
   algo: MyString
   url: MyString
   username: MyString

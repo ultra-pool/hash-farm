@@ -4,7 +4,6 @@ require 'bitcoin'
 require 'singleton'
 require "protocol/stratum"
 require "command_server"
-require "multicoin_pools/pool_picker"
 
 require_relative './proxy_pool'
 require_relative './rent_pool'
@@ -31,7 +30,7 @@ class MainServer < Stratum::Server
   attr_reader :pools, :current_pool
 
   def initialize
-    @config = ProfitMining.config.main_server
+    @config = HashFarm.config.main_server
     super( @config.host, @config.port )
     @handler = WorkerConnection
     @pools = []
@@ -58,10 +57,10 @@ class MainServer < Stratum::Server
     @pools.each(&:start)
     super
     EM.next_tick do
-      log.info "Starting CommandServer..."
-      cs_conf = ProfitMining.config.command_server
+      MainServer.log.info "Starting CommandServer..."
+      cs_conf = HashFarm.config.command_server
       @command_server = EM.start_server( cs_conf.host, cs_conf.port, PM::CommandServer )
-      log.info "CommandServer started on #{cs_conf.host}:#{cs_conf.port}"
+      MainServer.log.info "CommandServer started on #{cs_conf.host}:#{cs_conf.port}"
     end
   end
 
@@ -69,7 +68,7 @@ class MainServer < Stratum::Server
   def stop
     EM.next_tick do
       EM.stop_server( @command_server )
-      log.info "CommandServer stopped."
+      MainServer.log.info "CommandServer stopped."
     end
     super
     @pools.each(&:stop)
@@ -78,10 +77,9 @@ class MainServer < Stratum::Server
   # => pool
   def add_pool( pool )
     pool.on( 'error' ) do |error|
-      log.error( "#{pool.name} : #{error}" )
+      MainServer.log.error( "#{pool.name} : #{error}" )
       emit( 'error', pool.name, error )
     end
-
     @pools << pool
     if self.started?
       pool.start
@@ -90,10 +88,11 @@ class MainServer < Stratum::Server
     pool
   end
   
-  def delete_rent_pool( pool )
+  def delete_pool( pool )
     @pools.delete( pool )
     pool.on('empty') do pool.stop end
     pool.workers.each do |w| w.pool = choose_pool_for_new_worker end
+    pool
   end
 
 
@@ -102,17 +101,19 @@ class MainServer < Stratum::Server
   def on_subscribe worker, req
     sessionid = req.params[1]
     if sessionid.present? && @disconnected_workers[sessionid]
-      log.info "#{worker.name} Restart session #{sessionid}"
+      MainServer.log.info "#{worker.name} Restart session #{sessionid}"
       worker.reinit( @disconnected_workers.delete( sessionid )[1] )
     else
-      log.info "#{worker.name} Start new session."
-      choose_pool_for_new_worker.add_worker( worker )
+      MainServer.log.info "#{worker.name} Start new session."
+      pool = choose_pool_for_new_worker
+      return req.respond( false ) if pool.nil?
+      pool.add_worker( worker )
     end
     worker.on_subscribe req
   end
 
   def on_authorize worker, req
-    log.debug("authorizing #{req.params[0]}")
+    MainServer.log.info("authorizing #{req.params[0]}")
     username, _ = *req.params
     payout_address, worker_name = username.split('.')
     return req.respond( false ) if ! Bitcoin.valid_address?( payout_address )
@@ -121,9 +122,9 @@ class MainServer < Stratum::Server
     worker.model = Worker.find_or_create_by!( user_id: user.id, name: worker_name )
 
     req.respond( true )
-    log.verbose "[#{worker.name}] authorized => #{worker.name}."
+    MainServer.log.verbose "[#{worker.name}] authorized => #{worker.name}."
   rescue => err
-    log.error "MainServer.on_authorize #{worker.name} : #{err}\n" + err.backtrace[0..3].join("\n")
+    MainServer.log.error "MainServer.on_authorize #{worker.name} : #{err}\n" + err.backtrace[0..3].join("\n")
     req.respond( false )
     worker.close_connection
   end
@@ -133,7 +134,7 @@ class MainServer < Stratum::Server
     @disconnected_workers.delete_if { |sessionid, tab| tab.first < old }
     sessionid = worker.subscriptions["mining.notify"]
     @disconnected_workers[sessionid] = [Time.now.to_i, worker]
-    log.info "#{worker.name} Disconnected."
+    MainServer.log.info "#{worker.name} Disconnected."
   end
 
 
@@ -149,7 +150,7 @@ class MainServer < Stratum::Server
     return if self.workers.empty? || @pools.size <= 1
     move_all_workers( choose_pool_for_new_worker )
   rescue => err
-    log.error "Error during workers balance : #{err}\n" + err.backtrace[0..5].join("\n")
+    MainServer.log.error "Error during workers balance : #{err}\n" + err.backtrace[0..5].join("\n")
   end
 
   #############################################################################
@@ -180,24 +181,24 @@ class MainServer < Stratum::Server
       next_pool_idx = @pools.index( @current_pool ) + 1
       next_pool_idx %= @pools.size
     end
-    log.info("Going to switch to pool n°#{next_pool_idx+1}/#{@pools.size}")
+    MainServer.log.info("Going to switch to pool n°#{next_pool_idx+1}/#{@pools.size}")
 
     self.current_pool = @pools[next_pool_idx]
     # EM.add_timer( 4.days ) do switch_to_next_pool end
     self.current_pool
   rescue => err
-    log.error err
+    MainServer.log.error err
   end
 
   # => pool
   def current_pool=( pool )
     return pool if @current_pool == pool
     if @current_pool && pool
-      log.info "Change current pool from #{@current_pool.name} to #{pool.name}"
+      MainServer.log.info "Change current pool from #{@current_pool.name} to #{pool.name}"
     elsif @current_pool
-      log.info "Change current pool from #{@current_pool.name} to nil" 
+      MainServer.log.info "Change current pool from #{@current_pool.name} to nil"
     elsif pool
-      log.info("Change current pool to #{pool.name}")
+      MainServer.log.info("Change current pool to #{pool.name}")
     end
 
     @current_pool = pool
@@ -210,7 +211,7 @@ class MainServer < Stratum::Server
 
   def move_all_workers( pool=@current_pool )
     raise "pool must be a Pool, not a #{pool.class}" if ! pool.kind_of?( Pool )
-    log.info("Move all workers to #{pool.name}")
+    MainServer.log.info("Move all workers to #{pool.name}")
     workers.each do |w| w.pool = pool end
   end
 
@@ -219,11 +220,11 @@ class MainServer < Stratum::Server
     hahrate_taken = 0
 
     for pool in sorted_pools
-      log.info "for #{pool.name}, there are #{pool.workers.size} workers for %.2f Mhps" % (pool.hashrate.to_f / 10**6)
+      MainServer.log.info "for #{pool.name}, there are #{pool.workers.size} workers for %.2f Mhps" % (pool.hashrate.to_f / 10**6)
       pool_workers_taken, pool_hahrate_taken = get_workers_from( pool, hashrate_to_take - hahrate_taken,
         min_hashrate_to_leave, min_workers_to_leave )
 
-      log.info "Retrieve %.2f Mh/s from #{pool.name}." % (pool_hahrate_taken * 10**-6) unless pool_workers_taken.empty?
+      MainServer.log.info "Retrieve %.2f Mh/s from #{pool.name}." % (pool_hahrate_taken * 10**-6) unless pool_workers_taken.empty?
       workers_taken += pool_workers_taken
       hahrate_taken += pool_hahrate_taken
 

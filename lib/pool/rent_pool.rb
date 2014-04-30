@@ -25,8 +25,8 @@ class RentPool < ProxyPool
     raise "Cannot start a pool with done order." if order.done?
     super( order.uri, name: order.pool_name )
     @order = order
-    @max_hashrate = order.limit
-    log.info "[#{name}] max_hashrate=#{@max_hashrate}, hash_to_do=#{(@order.hash_to_do * 10**-9).to_f} GH, prof=#{order.price}"
+    @max_hashrate = order.limit && order.limit.mhash
+    log.info "[#{name}] max_hashrate=#{order.limit} MHs, hash_to_do=#{@order.hash_to_do.to_ghash} GH, prof=#{order.price}" if @order.price > Order::PRICE_MIN
   end
 
   def start
@@ -44,22 +44,18 @@ class RentPool < ProxyPool
     share = super
     return nil if share.nil?
 
-    unless @order.hash_to_do == Float::INFINITY
-      if share.valid_share?
-        order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
-        order.save!
-      end
-      log.info "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?"
-      if done?
-        emit('done')
-      end
+    if share.valid_share? && @order.price > Order::PRICE_MIN # TODO: remove last test. For debug purpose
+      order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
+      order.save!
     end
+    log.info "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?" if @order.price > Order::PRICE_MIN # For debug purpose
+    emit('done') if done?
 
     share
   end
 
   def done?
-    order.hash_done >= @order.hash_to_do
+    @order.hash_done >= @order.hash_to_do
   end
 
   def profitability

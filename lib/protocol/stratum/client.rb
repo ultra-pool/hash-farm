@@ -98,10 +98,11 @@ module Stratum
     rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR
       log.error "Lost connection on reading..."
       self.reconnect
-      nil
+      ""
     rescue => err
       log.error "while reading : #{err}\n" + err.backtrace[0...5].join("\n")
-      nil
+      self.reconnect
+      ""
     end
 
     def send_data data

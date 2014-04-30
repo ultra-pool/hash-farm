@@ -4,7 +4,6 @@ require 'test_helper'
 require 'ostruct'
 
 require "pool/pool"
-require "multicoin_pools/pool_picker"
 
 class PoolTest < ActiveSupport::TestCase
   setup do
@@ -47,7 +46,7 @@ class PoolTest < ActiveSupport::TestCase
     # Profitability set as a Number
     assert_equal 0.1, Pool.new("profit_2", profitability: 0.1).profitability
     # Profitability set as a Callable
-    pool = Pool.new("profit_3", profitability: -> { PoolPicker.profitability_of('middlecoin') } )
+    pool = Pool.new("profit_3", profitability: -> { sleep(0.2); 0.005 } )
     t = Time.now
     assert_kind_of Float, pool.profitability
     assert_operator Time.now - t, :>, 0.1

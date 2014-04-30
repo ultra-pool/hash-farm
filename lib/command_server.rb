@@ -44,8 +44,8 @@ module PM
             price = Float( req.params[2] ) rescue 0.001
             limit = Float( req.params[3] ) rescue nil
             prev_hashrate = [@ms.hashrate * 10**-6, limit || Float::INFINITY].min
-            puts "New RentPool @#{name} for ~#{(pay / price * 1.day / prev_hashrate).round} s at #{prev_hashrate} MHs"
-            order = Order.new(user_id: 1, url: url, username: username, password: password, pay: pay, price: price, limit: limit)
+            puts "New RentPool @#{URI(url).host} for ~#{(pay / price * 1.day / prev_hashrate).round} s at #{prev_hashrate} MHs"
+            order = Order.new(user_id: 1, url: url, pay: pay, price: price, limit: limit)
             if order.valid?
               @ms.add_rent_pool( order )
               req.respond true
@@ -64,8 +64,7 @@ module PM
           end
         rescue => err
           req.respond false
-          CommandServer.log.error err
-          CommandServer.log.error err.backtrace[0..2].join("\n")
+          CommandServer.log.error "#{err}\n" + err.backtrace[0..2].join("\n")
           CommandServer.log.error "with request #{req}"
         end
       end
@@ -85,7 +84,7 @@ module PM
             CommandServer.log.warn "Unknow method : '#{method.first}'"
           end
         rescue => err
-          CommandServer.log.error err + err.backtrace[0..2]
+          CommandServer.log.error "#{err}\n" + err.backtrace[0..2].join("\n")
           CommandServer.log.error "with notification #{notif}"
         end
       end

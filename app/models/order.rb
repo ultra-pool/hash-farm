@@ -22,14 +22,22 @@ class Order < ActiveRecord::Base
   # attr_accessible :running, :complete
   
   before_validation do
+    uri = URI(self.url) rescue nil
+    next false if uri.nil?
     if self.username.blank?
-      uri = URI(self.url)
       self.username = uri.user
-      self.password = uri.password if self.password.empty?
+      self.password = uri.password if self.password.blank?
+      uri.password = uri.user = nil
+      self.url = uri.to_s
     end
-    self.username
+    self.username && uri.host =~ /^[\w\.-]+$/
   end
 
+  validates :url, :username, :pay, :price, presence: true
+  validate :url_is_well_formed
+  def url_is_well_formed
+    URI( self.url ).host.present? rescue false
+  end
   validates :pay, numericality: { greater_than_or_equal_to: PAY_MIN }
   validates :pay, numericality: { less_than_or_equal_to: PAY_MAX }
   validates :price, numericality: { greater_than_or_equal_to: PRICE_MIN }

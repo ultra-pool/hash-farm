@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140430092012) do
+ActiveRecord::Schema.define(version: 20140430104027) do
 
   create_table "accounts", force: true do |t|
     t.integer  "coin_id",               null: false
@@ -78,8 +78,10 @@ ActiveRecord::Schema.define(version: 20140430092012) do
     t.datetime "updated_at"
     t.integer  "payout_id"
     t.string   "pool",        limit: 64, default: "CleverMining", null: false
+    t.integer  "order_id"
   end
 
+  add_index "shares", ["order_id"], name: "index_shares_on_order_id"
   add_index "shares", ["payout_id"], name: "index_shares_on_payout_id"
 
   create_table "transactions", force: true do |t|

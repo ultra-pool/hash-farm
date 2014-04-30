@@ -28,6 +28,7 @@ class RentServer < MainServer
   def check_orders
     rsorted_pools = @pools.sort.reverse
     available_pool_hashrate = rsorted_pools.map { |pool| (pool.max_hashrate || self.hashrate*2) - pool.hashrate }.sum
+    puts "%d, %d" % [Order.count, Order.uncomplete.waiting.size]
     waiting_orders = Order.uncomplete.waiting.sort - rsorted_pools.map(&:order) # if any not started yet
     return if waiting_orders.empty?
     best_waiting_price = waiting_orders.last.price
@@ -42,10 +43,11 @@ class RentServer < MainServer
     # if there is too much available pool waiting for hashrate, remove the less profitable pool
     elsif @pools.size > 3 && self.hashrate < available_pool_hashrate - ((rsorted_pools[-1].max_hashrate || self.hashrate*2) - rsorted_pools[-1].hashrate)
       log.verbose "too much hashrate available, delete last pool"
-      delete_rent_pool( rsorted_pools[-1] ).on('stopped') { check_orders }
+      rsorted_pools[-1].on('stopped') { check_orders }
+      delete_rent_pool( rsorted_pools[-1] )
     end
   rescue => err
-    log.error "#{err}\n" + err.backtrace[0..5].join("\n")
+    log.error "#{err}\n"# + err.backtrace[0..5].join("\n")
   end
 
   def add_rent_pool( order )
@@ -53,7 +55,7 @@ class RentServer < MainServer
     pool.on( 'done' ) { delete_rent_pool( pool ) }
     add_pool( pool )
   rescue => err
-    log.error "#{err}\n" + err.backtrace[0...5].join("\n")
+    log.error "#{err}\n"# + err.backtrace[0...5].join("\n")
     nil
   end
 
@@ -109,7 +111,7 @@ class RentServer < MainServer
         to_move_workers += res.first
       end
     end
-
+    puts "must disconnect #{to_move_workers.size} workers" if ! to_move_workers.empty?
   rescue => err
     log.error "Error during workers balance : #{err}\n" + err.backtrace[0..5].join("\n")
   end

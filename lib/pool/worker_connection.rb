@@ -230,7 +230,7 @@ class WorkerConnection < EM::Connection
       time = Time.now - shares[-NB_SHARE_MEAN].created_at
       rate = (sum_diff / time * 2 ** 32).round
     end
-    log.verbose "[" + @name + "] hashrate is " + rate.to_s
+    log.debug "[" + @name + "] hashrate is " + rate.to_s
     rate
   end
 
@@ -244,7 +244,7 @@ class WorkerConnection < EM::Connection
       valid_rate = vshares[-NB_SHARE_MEAN..-1].map { |s| s.worker_difficulty }.inject(:+) / (Time.now - vshares[-NB_SHARE_MEAN].created_at) * 2 ** 32
     end
     valid_rate = valid_rate.round
-    log.verbose "[" + @name + "] valid_hashrate is " + valid_rate.to_s
+    log.debug "[" + @name + "] valid_hashrate is " + valid_rate.to_s
     valid_rate
   end
 
@@ -262,7 +262,7 @@ class WorkerConnection < EM::Connection
       invalid_rate = sum_diff / time * 2 ** 32
     end
     invalid_rate = invalid_rate.round
-    log.verbose "[" + @name + "] invalid_hashrate is " + invalid_rate.to_s
+    log.debug "[" + @name + "] invalid_hashrate is " + invalid_rate.to_s
     invalid_rate
   end
 

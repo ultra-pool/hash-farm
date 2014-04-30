@@ -76,7 +76,7 @@ class ProxyPool < Pool
     @proxy.on( 'connected' ) { authentify }
   end
 
-  def authentify( callback=nil )
+  def authentify
     @proxy.mining.on( 'notify' ) { |job| on_pool_notify( job ) }
     @proxy.mining.on( 'set_difficulty' ) { |diff| on_pool_set_difficulty( diff ) }
 
@@ -87,28 +87,31 @@ class ProxyPool < Pool
           @session_id = @notifications[0][1]
           @worker_extra_nonce_2_size = @extra_nonce_2_size > 1 ? (@extra_nonce_2_size / 2.0).floor : @extra_nonce_2_size
           @proxy_extra_nonce_2_size = @extra_nonce_2_size - @worker_extra_nonce_2_size
-          ProxyPool.log.verbose( "[#{@host}] subscribe : extra1=%s, extra2size=%d" % [@extra_nonce_1, @extra_nonce_2_size] )
+          ProxyPool.log.verbose "[#{@host}] subscribe : extra1=%s, extra2size=%d" % [@extra_nonce_1, @extra_nonce_2_size]
 
           @workers.each { |w| w.client.reconnect }
         end
         @proxy.mining.authorize( @username, @password ) do |resp|
           if resp.result? && resp.result
-            ProxyPool.log.info( "[#{@host}] Started" )
             @authentified = true
-            callback.call if callback.present?
-            emit( 'started' )
+            pool_start
           elsif resp.result?
             emit( 'error', "not authorized" )
+            stop
           else
             emit( 'error', "During authorization : #{resp.error}" )
+            stop
           end
         end
       else
         emit( 'error', "During subscription : #{resp.error}" )
+        stop
       end
     end
   end
 
+  # Alias the Pool::start() method to call it later in authorize
+  alias_method :pool_start, :start
   def start
     @proxy.connect
     # Rescue if fail to authentify.
@@ -123,14 +126,14 @@ class ProxyPool < Pool
   end
 
   def stop
+    return if ! started?
     @proxy.close
-    emit( 'stopped' )
-    ProxyPool.log.verbose( "[#{@host}] Stopped." )
+    super
     self
   end
 
   def notify_all_workers job=@last_job
-    ProxyPool.log.verbose( "[#{@host}] Notify #{@workers.size} workers with job #{job.id}." )
+    ProxyPool.log.verbose "[#{@host}] Notify #{@workers.size} workers with job #{job.id}."
     @workers.each do |worker|
       worker.notify( job )
     end
@@ -140,13 +143,13 @@ class ProxyPool < Pool
 
   def on_pool_set_difficulty diff
     @next_diff = diff.to_f / 2**16
-    ProxyPool.log.verbose( "[#{@host}] New difficulty received : #{@next_diff}." )
+    ProxyPool.log.verbose "[#{@host}] New difficulty received : #{@next_diff}."
     @workers.each do |worker| adjust_difficulty( worker ) end
     # @workers.each do |worker| worker.set_difficulty @next_diff end
   end
 
   def on_pool_notify job
-    ProxyPool.log.verbose( "[#{@host}] New job received : #{job}." )
+    ProxyPool.log.verbose "[#{@host}] New job received : #{job}."
     job.pool = @name
     # We notify workers as quickly as possible
     notify_all_workers( job )
@@ -206,10 +209,12 @@ class ProxyPool < Pool
           share.pool_result = false
           share.reason = resp.error.to_s
         end
-        share.save!
+        if share.valid?
+          share.save!
+        else
+          log.error "Share invalid before save ! #{share.to_json}"
+        end
       end
-    else
-      share.save!
     end
 
     share
@@ -217,8 +222,7 @@ class ProxyPool < Pool
     ProxyPool.log.warn "[#{worker.name}] Fail on submit : #{err}\n" + err.backtrace[0...5].join("\n")
     nil
   rescue => err
-    ProxyPool.log.error err
-    ProxyPool.log.error err.backtrace[0..5].join("\n")
+    ProxyPool.log.error "#{err}\n" + err.backtrace[0..5].join("\n")
     ProxyPool.log.error "worker=#{worker.inspect}"
     ProxyPool.log.error "share=#{share.inspect}"
     nil
@@ -234,7 +238,7 @@ class ProxyPool < Pool
   def compute_diff( worker )
     [super, @next_diff].min
   end
-  
+
   # def shares( since=Time.now-1.hour, untl=now )
   #   Share.where( pool: @name, pool_result: true ).where( ["created_at > ? AND created_at <= ?", since, untl] )
   # end

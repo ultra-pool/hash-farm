@@ -44,6 +44,23 @@ class Pool
     @profitability_timeout = Time.now.to_f
   end
 
+  def start
+    @started = true
+    Pool.log.verbose "[#{@name}] Started."
+    emit( 'started' )
+  end
+
+  def started?
+    @started
+  end
+
+  def stop
+    return if ! @started
+    @started = false
+    Pool.log.verbose "[#{@name}] Stopped."
+    emit( 'stopped' )
+  end
+
   def add_worker worker
     return if @workers.last == worker
     @workers << worker
@@ -103,12 +120,10 @@ class Pool
 
     return share
   rescue ArgumentError => err
-    Pool.log.warn "[#{worker.name}] Fail on submit : #{err}"
-    Pool.log.warn err.backtrace[0]
+    Pool.log.warn "[#{worker.name}] Fail on submit : #{err}\n" + err.backtrace[0]
     req.respond( false ) && nil
   rescue => err
-    Pool.log.error err
-    Pool.log.error err.backtrace.join("\n")
+    Pool.log.error "#{err}\n" + err.backtrace[0...5].join("\n")
     Pool.log.error "worker=#{worker.inspect}"
     Pool.log.error "job=#{job.to_a}"
     Pool.log.error "submit=#{submit.to_a}"

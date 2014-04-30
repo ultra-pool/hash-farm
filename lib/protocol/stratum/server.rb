@@ -19,12 +19,12 @@ Methods :
   stop
 
 Signals :
-  emit( 'start' )
+  emit( 'started' )
   emit( 'connect', cnx, params )
   emit( 'disconnect', cxn )
   emit( 'notification', cxn, notif )
   emit( 'request', cxn, req )
-  emit( 'stop' )
+  emit( 'stopped' )
 
 # Usage :
 
@@ -64,7 +64,7 @@ module Stratum
     include Loggable
     include Listenable
 
-    SIGNALS = ["start", "connect", "disconnect", "notification", "request", "stop"]
+    SIGNALS = ["started", "connect", "disconnect", "notification", "request", "stopped"]
 
     attr_reader :host, :port
     attr_reader :handler
@@ -113,7 +113,7 @@ module Stratum
         @server_signature = EventMachine.start_server( host, port, @handler )
         Server.log.info "Started Stratum::Server on #{host}:#{port}..."
         @started = true
-        emit( 'start' )
+        emit( 'started' )
       end
 
       Stratum::Handler.on( 'connect' ) do |cxn|
@@ -137,13 +137,15 @@ module Stratum
     end
 
     def stop
-      EventMachine.stop_server( @server_signature ) rescue nil
-      @started = false
+      EM.next_tick do
+        EventMachine.stop_server( @server_signature ) rescue nil
+        @started = false
+        emit( 'stopped' )
+      end
       # Server.log.info "Stratum::Server on #{host}:#{port} stopped." # can't be called from trap context (ThreadError)
       Stratum::Handler.off(self, 'connect')
       # ObjectSpace.each_object(@handler) do |cxn| cxn.close end
       Stratum::Handler.off(self, 'disconnect')
-      emit( 'stop' )
       self
     end
 

@@ -72,11 +72,9 @@ class ProxyPool < Pool
   end
 
   def init_listeners
+    forward( @proxy, 'error' )
     on( 'error' ) do |error| ProxyPool.log.error( error.to_s ) end
     @proxy.on( 'connected' ) { authentify }
-    @proxy.on( 'disconnect' ) { emit( 'stopped' ) }
-
-    forward( @proxy, 'error' )
   end
 
   def authentify( callback=nil )
@@ -94,13 +92,12 @@ class ProxyPool < Pool
 
           @workers.each { |w| w.client.reconnect }
         end
-
         @proxy.mining.authorize( @username, @password ) do |resp|
           if resp.result? && resp.result
-            emit( 'started' )
+            ProxyPool.log.info( "[#{@host}] Started" )
             @authentified = true
             callback.call if callback.present?
-            ProxyPool.log.info( "[#{@host}] Started" )
+            emit( 'started' )
           elsif resp.result?
             emit( 'error', "not authorized" )
           else
@@ -128,6 +125,7 @@ class ProxyPool < Pool
 
   def stop
     @proxy.close
+    emit( 'stopped' )
     ProxyPool.log.verbose( "[#{@host}] Stopped." )
     self
   end

@@ -44,7 +44,7 @@ class MultiProxyServer < MainServer
     pool.on( 'low_hashrate' ) do fill_holes end
     add_pool( pool )
   rescue => err
-    puts err, err.backtrace[0...5].join("\n")
+    log.error "#{err}\n" + err.backtrace[0...5].join("\n")
     nil
   end
 

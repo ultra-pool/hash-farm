@@ -12,8 +12,14 @@ namespace :profit_mining do
     pm_server = MainServer.instance
     pm_server.start
 
-    Signal.trap("TERM")  { puts "'TERM' signal received. Going to shutdown ProfitMining..."; pm_server.stop; EM.stop }
-    Signal.trap("INT")  { puts "'INT' signal received. Going to shutdown ProfitMining..."; pm_server.stop; EM.stop }
+    Signal.trap("TERM") do
+      puts "'TERM' signal received. Going to shutdown ProfitMining..."
+      EM.add_timer(0) { pm_server.stop; EM.stop }
+    end
+    Signal.trap("INT") do
+      puts "'INT' signal received. Going to shutdown ProfitMining..."
+      EM.add_timer(0) { pm_server.stop; EM.stop }
+    end
 
     EM.reactor_thread.join
   end # task :start

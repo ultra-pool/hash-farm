@@ -15,7 +15,7 @@
   <link rel="shortcut icon" href="favicon.ico" />
 </head>
 <% if controller.action_name.eql?('promo') %>
-  <body class="page-header-fixed page-full-width">
+  <body class="page-header-fixed page-boxed page-full-width">
 <% else %>
   <body class="page-header-fixed">
 <% end %>
@@ -26,7 +26,12 @@
 
 <div class="page-container">
   <%= render "widgets/sidebar" %>
-  <%= yield %>
+  <div class="page-content-wrapper">
+    <div class="page-content">
+      <%= render "widgets/flash_messages" %>
+      <%= yield %>
+    </div>
+  </div>
 </div>
 
 <%= render "widgets/footer" %>

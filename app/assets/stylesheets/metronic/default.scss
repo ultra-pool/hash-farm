@@ -235,7 +235,7 @@ Sidebar toggler
   background-color: #3d3d3d !important;
 }
 .page-sidebar-closed .page-sidebar .sidebar-search.open .form-container .remove {
-  background-image: url("../../img/sidebar-search-close.png");
+  background-image: image-url('sidebar-search-close.png');
 }
 /* sub menu bg color on hover menu item */
 .page-sidebar-closed ul.page-sidebar-menu > li:hover .sub-menu {

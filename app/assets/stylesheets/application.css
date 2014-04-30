@@ -16,5 +16,6 @@
  *= require metronic/style-responsive
  *= require metronic/plugins
  *= require metronic/default
+ *= require metronic/animate
  *= require_tree .
  */

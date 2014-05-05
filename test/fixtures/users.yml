@@ -20,3 +20,13 @@ barbu:
   payout_address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh
   is_anonymous: false
   is_admin: true
+
+mv:
+  id: 42
+  name: mv
+  password: toto
+  email: mv@mail.com
+  payout_address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh
+  is_anonymous: false
+  is_admin: true
+

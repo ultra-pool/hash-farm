@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable, :confirmable
+
   has_many :workers
   has_many :shares, through: :workers
   

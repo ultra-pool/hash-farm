@@ -57,13 +57,15 @@ ActiveRecord::Schema.define(version: 20140505122353) do
   add_index "orders", ["user_id"], name: "index_orders_on_user_id"
 
   create_table "shares", force: true do |t|
-    t.integer  "worker_id",                                       null: false
-    t.string   "solution",    limit: 64,                          null: false
-    t.float    "difficulty",                                      null: false
-    t.boolean  "our_result",                                      null: false
+    t.integer  "worker_id",              null: false
+    t.string   "pool",        limit: 64, null: false
+    t.string   "solution",    limit: 64, null: false
+    t.float    "difficulty",             null: false
+    t.boolean  "our_result",             null: false
     t.boolean  "pool_result"
     t.string   "reason"
-    t.boolean  "is_block",                                        null: false
+    t.boolean  "is_block",               null: false
+    t.integer  "payout_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "pool",        limit: 64, default: "CleverMining", null: false
@@ -73,18 +75,35 @@ ActiveRecord::Schema.define(version: 20140505122353) do
   add_index "shares", ["order_id"], name: "index_shares_on_order_id"
 
   create_table "users", force: true do |t|
-    t.string   "name",           limit: 64
-    t.string   "password",       limit: 64
+    t.string   "name",                   limit: 64
+    t.string   "password",               limit: 64
     t.string   "email"
-    t.string   "payout_address", limit: 34,                                          null: false
-    t.boolean  "is_anonymous",                                                       null: false
-    t.boolean  "is_admin",                                                           null: false
+    t.string   "payout_address",         limit: 34,                                       null: false
+    t.boolean  "is_anonymous",                                                            null: false
+    t.boolean  "is_admin",                                                                null: false
+    t.integer  "balance",                                                    default: 0
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "balance",                                            default: 0
-    t.string   "wallet_address", limit: 34
-    t.decimal  "min_price",                 precision: 16, scale: 8, default: 0.001, null: false
+    t.string   "wallet_address",         limit: 34
+    t.decimal  "min_price",                         precision: 16, scale: 8
+    t.string   "encrypted_password",                                         default: "", null: false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",                                              default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.string   "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string   "unconfirmed_email"
   end
+
+  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+  add_index "users", ["email"], name: "index_users_on_email"
+  add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
   create_table "workers", force: true do |t|
     t.integer  "user_id",                 null: false

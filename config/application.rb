@@ -23,9 +23,21 @@ module HashFarm
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :en
     config.i18n.enforce_available_locales = false
+
+    config.serialized_master_key = {
+      public: 'xpub661MyMwAqRbcG2V5zGfVX28LzHCBm7BHhEeMun3WjJUJQhmT6SnhpF2m2BXh7bwnbQ3x3oRGW2hjxzkBcCu8oDjNod4cUJT9j5pHoMVFGsE',
+      private: nil
+    }
+
+    if File.exists?("#{Rails.root}/private_master_key").present?
+      config.serialized_master_key[:private] = File.read("#{Rails.root}/private_master_key").chomp
+    end
+
   end
 
   def self.config
     Application.config
   end
+
+
 end

@@ -2,8 +2,16 @@ require 'rubygems'
 require 'rake'
 
 desc "HashFarm Multicoin pool admin"
-namespace :profit_mining do
+namespace :hash_farm do
 
+  desc "Generate a new serialized seed for deposit addresses"
+  # rake hash_farm:gen_seed[deadbeef]
+  task :gen_seed, [:seed] => :environment do |t, args|
+    master = MoneyTree::Master.new seed_hex: args[:seed]
+    puts "Master public serialized: " + master.to_serialized_address(:public)
+    puts "Master private serialized: " + master.to_serialized_address(:private)
+  end
+    
   desc "Start a HashFarm instance."
   task :start => :environment do |t|
     require 'pool/main_server'
@@ -40,4 +48,4 @@ namespace :profit_mining do
     end
   end
 
-end # namespace :profit_mining
+end # namespace :hash_farm

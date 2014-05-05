@@ -20,6 +20,7 @@ gem 'nokogiri'
 gem 'mechanize'
 gem 'devise'
 gem 'mailjet'
+gem 'money-tree'
 
 group :doc do
   gem 'sdoc', require: false

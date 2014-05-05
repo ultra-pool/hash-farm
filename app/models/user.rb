@@ -26,4 +26,18 @@ class User < ActiveRecord::Base
   def hashrate( *args, **hargs )
     workers.map { |w| w.hashrate( *args, **hargs ) }.sum
   end
+
+  def deposit_key
+    if HashFarm.config.serialized_master_key[:private].nil?
+      m = MoneyTree::Master.from_serialized_address HashFarm.config.serialized_master_key[:public]
+      public_key = m.node_for_path("m/#{self.id}/0").public_key
+      key = Bitcoin::Key.new(nil,public_key.to_hex, true)
+    else
+      m = MoneyTree::Master.from_serialized_address HashFarm.config.serialized_master_key[:private]
+      private_key = m.node_for_path("m/#{self.id}/0").private_key
+      key = Bitcoin::Key.new(private_key.to_hex, nil, true)
+    end
+    key
+  end
+
 end

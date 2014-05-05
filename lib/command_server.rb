@@ -44,7 +44,7 @@ module PM
             price = Float( req.params[2] ) rescue 0.001
             limit = Float( req.params[3] ) rescue nil
             prev_hashrate = [@ms.hashrate * 10**-6, limit || Float::INFINITY].min
-            puts "New RentPool @#{URI(url).host} for ~#{(pay / price * 1.day / prev_hashrate).round} s at #{prev_hashrate} MHs"
+            puts "New RentPool @#{URI(url).host} for ~#{(pay / price * 1.day / prev_hashrate).fround} s at #{prev_hashrate} MHs"
             order = Order.new(user_id: 1, url: url, pay: pay, price: price, limit: limit)
             if order.valid?
               @ms.add_rent_pool( order )

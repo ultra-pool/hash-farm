@@ -160,7 +160,7 @@ class MainServer < Stratum::Server
   #############################################################################
 
   def workers
-    @pools.map(&:workers).sum
+    @pools.flat_map(&:workers)
   end
 
   def hashrate

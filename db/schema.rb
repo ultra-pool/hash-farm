@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140430142446) do
+ActiveRecord::Schema.define(version: 20140505122353) do
 
   create_table "orders", force: true do |t|
     t.integer  "user_id",                                                           null: false
@@ -31,16 +31,6 @@ ActiveRecord::Schema.define(version: 20140430142446) do
 
   add_index "orders", ["user_id"], name: "index_orders_on_user_id"
 
-  create_table "payouts", force: true do |t|
-    t.integer  "transaction_id", null: false
-    t.integer  "our_fees",       null: false
-    t.integer  "users_amount",   null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "payouts", ["transaction_id"], name: "index_payouts_on_transaction_id"
-
   create_table "shares", force: true do |t|
     t.integer  "worker_id",              null: false
     t.string   "pool",        limit: 64, null: false
@@ -53,20 +43,11 @@ ActiveRecord::Schema.define(version: 20140430142446) do
     t.integer  "payout_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "pool",        limit: 64, default: "CleverMining", null: false
     t.integer  "order_id"
   end
 
   add_index "shares", ["order_id"], name: "index_shares_on_order_id"
-  add_index "shares", ["payout_id"], name: "index_shares_on_payout_id"
-
-  create_table "transactions", force: true do |t|
-    t.string   "raw"
-    t.string   "txid"
-    t.string   "ourid"
-    t.string   "block"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "users", force: true do |t|
     t.string   "name",                   limit: 64

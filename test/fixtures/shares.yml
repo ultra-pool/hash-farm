@@ -7,7 +7,6 @@ one:
   our_result: false
   pool_result: false
   reason: MyString
-  is_block: false
 
 two:
   worker: two
@@ -16,7 +15,6 @@ two:
   our_result: false
   pool_result: false
   reason: MyString
-  is_block: false
 
 payout1:
   worker: one
@@ -25,7 +23,6 @@ payout1:
   our_result: true
   pool_result: true
   reason: MyString
-  is_block: false
 
 payout2:
   worker: two
@@ -34,7 +31,6 @@ payout2:
   our_result: true
   pool_result: true
   reason: MyString
-  is_block: false
 
 payout3:
   worker: one
@@ -43,7 +39,6 @@ payout3:
   our_result: true
   pool_result: false
   reason: MyString
-  is_block: false
 
 payout4:
   worker: two
@@ -52,7 +47,6 @@ payout4:
   our_result: false
   pool_result: false
   reason: MyString
-  is_block: false
 
 payout5:
   worker: barbu1
@@ -61,4 +55,3 @@ payout5:
   our_result: true
   pool_result: true
   reason: MyString
-  is_block: false

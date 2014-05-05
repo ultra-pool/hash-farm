@@ -20,4 +20,10 @@ class User < ActiveRecord::Base
   def name
     super || self.payout_address
   end
+
+  # Sum all user's workers' hashrate.
+  # See Worker.hashrate for more information.
+  def hashrate( *args, **hargs )
+    workers.map { |w| w.hashrate( *args, **hargs ) }.sum
+  end
 end

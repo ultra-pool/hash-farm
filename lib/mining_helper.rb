@@ -112,6 +112,22 @@ module MiningHelper
     (diff.to_f * 2**48 / 0xffff).to_i
   end
 
+  def self.hashrate( shares, validity=nil )
+    shares = shares.to_a
+    raise TypeError, "Shares: wait an Array, get a #{shares.class}." if ! shares.kind_of?( Enumerable )
+    raise TypeError, "Shares: wait an Array of Share." if ! shares.all? { |s| s.kind_of?( Share ) }
+    raise ArgumentError, "Too few shares to compute a hashrate." if shares.size < 2
+    raise TypeError, "Validity: wait a Boolean, get a #{validity.class}." if ! validity.nil? && (validity != !! validity)
+
+    delay = shares.last.created_at - shares.first.created_at
+    shares = shares[1..-1]
+    shares.select! { |s| s.our_result == validity } if ! validity.nil?
+    diff = shares.map(&:difficulty).sum
+    rate = difficulty_to_nb_hash( diff ) / delay
+    # puts "-#{diff} diff / #{delay} delay => #{rate} rate"
+    rate
+  end
+
   ######   ADDRESS  HELPERS   #######
 
   def self.hash160_from_address( addr )

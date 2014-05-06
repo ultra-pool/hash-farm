@@ -105,12 +105,22 @@ class WorkerConnection < EM::Connection
 
   def pool=( new_pool )
     old_pool = @pool
-    return if new_pool == old_pool
-    client.reconnect() unless old_pool.nil?
-    @pool = new_pool
-    log.debug("[#{name}] change pool : #{old_pool.name} => #{new_pool.name}") unless old_pool.nil?
-    emit( 'pool_changed' )
-    new_pool.add_worker( self )
+      @pool = new_pool
+    if new_pool == old_pool
+      return
+    elsif old_pool.nil? && new_pool.present?
+      log.info "[#{name}] connect to #{new_pool.name}"
+      new_pool.add_worker( self )
+    elsif old_pool.present? && new_pool.nil?
+      log.info "[#{name}] disconnect of #{old_pool.name}"
+      close_connection_after_writing
+      emit( 'pool_changed' )
+    else
+      log.info "[#{name}] change pool : #{old_pool.name} => #{new_pool.name}"
+      client.reconnect()
+      emit( 'pool_changed' )
+      new_pool.add_worker( self )
+    end
     new_pool
   rescue => err
     log.error "Error during pool= : #{err}\n" + err.backtrace[0..5].join("\n")
@@ -140,7 +150,7 @@ class WorkerConnection < EM::Connection
 
   def add_share( share )
     shares << share
-    shares.shift if shares.size > 50
+    shares.shift(10) if shares.size >= 50
     share
   end
 

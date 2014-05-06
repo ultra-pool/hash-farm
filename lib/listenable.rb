@@ -61,9 +61,23 @@ USAGE
     def emit(signal, *args)
       @listenable ||= {}
       @listenable[signal] ||= []
-      @listenable[signal].each { |m| m.call( *args ) }
+      @listenable[signal].each { |m| call( m, signal, args ) }
       @listenable[:__all] ||= []
-      @listenable[:__all].each { |m| m.call( signal, *args ) }
+      @listenable[:__all].each { |m| call( m, signal, [signal, *args] ) }
+    end
+
+    def call( callback, signal, args )
+      callback.call( *args )
+    rescue => err
+      msg  = "Error on('#{signal}') : #{err}\n"
+      msg += "@ #{callback.source_location}\n"
+      msg += "With args : #{args.inspect}\n"
+      msg += err.backtrace[0...5].join("\n")
+      if self.respond_to?( :log )
+        log.error msg
+      else
+        puts "[%s][ERROR][%s] %s" % [Time.now.strftime("%T"), self.class.name.underscore, msg]
+      end
     end
 
     def forward( obj, signal=:__all )

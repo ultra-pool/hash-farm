@@ -46,7 +46,7 @@ class Pool
 
   def start
     @started = true
-    Pool.log.verbose "[#{@name}] Started."
+    Pool.log.info "[#{@name}] Started."
     emit( 'started' )
   end
 
@@ -57,7 +57,7 @@ class Pool
   def stop
     return if ! @started
     @started = false
-    Pool.log.verbose "[#{@name}] Stopped."
+    Pool.log.info "[#{@name}] Stopped."
     emit( 'stopped' )
   end
 
@@ -85,16 +85,16 @@ class Pool
   def submit worker, req
     submit = Stratum::Submit.new(*req.params)
 
-    Pool.log.debug("[#{name}][#{worker.name}] submit #{submit.to_a}")
+    Pool.log.debug("[#{name}][#{worker.name}] Submit #{submit.to_a}")
 
     # Check job_id
     job = @previous_jobs[ submit.job_id ]
-    # TODO: Allow share if it is just a second late
+    # TODO? Allow share if it is just a second late
     if job.nil? && @previous_jobs.size == 0
       return req.respond( false ) && nil
     elsif job.nil?
       worker.stales += 1
-      Pool.log.verbose "Stale from #{worker}."
+      Pool.log.warn "[#{name}][#{worker.name}] Stale."
       return req.respond( false ) && nil
     end
     # Check submit

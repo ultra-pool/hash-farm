@@ -28,7 +28,6 @@ class RentServer < MainServer
   def check_orders
     rsorted_pools = @pools.sort.reverse
     available_pool_hashrate = rsorted_pools.map { |pool| (pool.max_hashrate || self.hashrate*2) - pool.hashrate }.sum
-    puts "%d, %d" % [Order.count, Order.uncomplete.waiting.size]
     waiting_orders = Order.uncomplete.waiting.sort - rsorted_pools.map(&:order) # if any not started yet
     return if waiting_orders.empty?
     best_waiting_price = waiting_orders.last.price

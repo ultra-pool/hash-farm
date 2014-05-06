@@ -44,6 +44,13 @@ module Stratum
       [@id, @prev_hash, @coinb1, @coinb2, @merkle_branches, @version, @nbits, @ntime, @clean]
     end
 
+    def to_s
+      "#<Stratum::Job:#{id}@#{Time.at(ntime)}>"
+    end
+    def inspect
+      to_s
+    end
+
     def to_stratum
       [
         @id,

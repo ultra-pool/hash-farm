@@ -19,9 +19,6 @@ require_relative './worker_connection'
 #   started
 #   stopped
 #   error(err)
-#   bad_connection
-#   lost_connection
-#   good_connection
 #
 class ProxyPool < Pool
   include Loggable
@@ -41,7 +38,11 @@ class ProxyPool < Pool
   #
   # ProxyPool.new( "middlecoin.com", 3333, "barbu", "toto" )
   # ProxyPool.new( "http://barbu:toto@middlecoin.com:3333" )
+  # ProxyPool.new( url: "http://barbu:toto@middlecoin.com:3333" )
+  # ProxyPool.new( url: "http://middlecoin.com:3333", user: "barbu", password: "toto" )
+  # ProxyPool.new( "http://middlecoin.com:3333", "barbu", "toto" )
   # ProxyPool.new( URI("http://barbu:toto@middlecoin.com:3333") )
+  # ProxyPool.new( URI("http://middlecoin.com:3333"), "barbu", "toto" )
   #
   def initialize( *args, **opt )
     @options = opt
@@ -49,17 +50,21 @@ class ProxyPool < Pool
     # Connection's options
     if args.size == 4
       @host, @port, @username, @password = *args
-    elsif args.size == 1 && args.first.kind_of?( URI )
-      uri = args.first
-    elsif args.size == 1 && args.first.kind_of?( String )
-      uri = URI( args.first )
-    elsif opt[:host]
-      uri = URI( opt[:host] )
+    elsif args.first.kind_of?( URI ) || opt[:uri]
+      uri = args.first || opt[:uri]
+      uri.user ||= args[1] || opt[:user]
+      uri.password ||= args[2] || opt[:password]
+      @host, @port, @username, @password = uri.host, uri.port, uri.user, uri.password
+    elsif args.first.kind_of?( String ) || opt[:url]
+      uri = URI( args.first ) || opt[:url]
+      uri.user ||= args[1] || opt[:user]
+      uri.password ||= args[2] || opt[:password]
+      @host, @port, @username, @password = uri.host, uri.port, uri.user, uri.password
     else
       raise ArgumentError, "wrong number of argument"
     end
-    @host, @port, @username, @password = uri.host, uri.port, uri.user, uri.password if uri
 
+    # Pool.initialize
     super( opt[:name] || @host, opt )
 
     @proxy = Stratum::Client.new( @host, @port, back: @options[:back] )
@@ -74,6 +79,11 @@ class ProxyPool < Pool
     forward( @proxy, 'error' )
     on( 'error' ) do |error| ProxyPool.log.error( error.to_s ) end
     @proxy.on( 'connected' ) { authentify }
+    @proxy.on( 'reconnected' ) {
+      @authentified = false
+      authentify
+    }
+    @proxy.on( 'disconnected' ) { @authentified = false }
   end
 
   def authentify
@@ -82,20 +92,25 @@ class ProxyPool < Pool
 
     @proxy.mining.subscribe( @version, @session_id ) do |resp|
       if resp.result?
+        # If new session
         if resp.result[1] != @extra_nonce_1 || resp.result[2] != @extra_nonce_2_size
           @notifications, @extra_nonce_1, @extra_nonce_2_size = *resp.result
+          if ! @notifications.kind_of?( Array ) || @notifications.size != 2
+            ProxyPool.log.warn "[#{@host}] On subscribed, notifications = #{@notifications}"
+          end
           @session_id = @notifications[0][1]
           @worker_extra_nonce_2_size = @extra_nonce_2_size > 1 ? (@extra_nonce_2_size / 2.0).floor : @extra_nonce_2_size
           @proxy_extra_nonce_2_size = @extra_nonce_2_size - @worker_extra_nonce_2_size
           ProxyPool.log.verbose "[#{@host}] subscribe : extra1=%s, extra2size=%d" % [@extra_nonce_1, @extra_nonce_2_size]
-
+          # On a reconnect.
           @workers.each { |w| w.client.reconnect }
         end
+
         @proxy.mining.authorize( @username, @password ) do |resp|
           if resp.result? && resp.result
             @authentified = true
-            pool_start
-          elsif resp.result?
+            pool_start # Call super.start
+          elsif resp.result? # => resp.result != true
             emit( 'error', "not authorized" )
             stop
           else
@@ -113,7 +128,9 @@ class ProxyPool < Pool
   # Alias the Pool::start() method to call it later in authorize
   alias_method :pool_start, :start
   def start
+    ProxyPool.log.info "[#{name}] Starting..."
     @proxy.connect
+    # @proxy.on( 'connected' ) { authentify } in init_listeners
     # Rescue if fail to authentify.
     EM.add_timer( 30.seconds ) do
       if ! self.authentified
@@ -126,6 +143,7 @@ class ProxyPool < Pool
   end
 
   def stop
+    ProxyPool.log.info "[#{name}] Stopping..."
     return if ! started?
     @proxy.close
     super
@@ -192,7 +210,7 @@ class ProxyPool < Pool
     # Check valid pool share
     _, job_id, extranonce2, ntime, nonce = *req.params
     pdiff = jobs_pdiff[job_id]
-    ProxyPool.log.debug "pdiff for #{job_id} = #{pdiff}"
+    # ProxyPool.log.debug "pdiff for #{job_id} = #{pdiff}"
     if share.match_difficulty( pdiff )
       extra_nonce_2 = worker.extra_nonce_1[@extra_nonce_1.size...@extra_nonce_1.size+@proxy_extra_nonce_2_size*2] # hex to byte
       extra_nonce_2 += share.extra_nonce_2

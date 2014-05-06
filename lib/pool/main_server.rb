@@ -94,7 +94,6 @@ class MainServer < Stratum::Server
   
   def delete_pool( pool )
     @pools.delete( pool )
-    pool.on('empty') do pool.stop end
     pool.workers.each do |w| w.pool = choose_pool_for_new_worker end
     pool
   end

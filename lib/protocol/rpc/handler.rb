@@ -56,12 +56,13 @@ module Rpc
       @response_waited = {} # ID => Callback
       @rport, @rip = Socket.unpack_sockaddr_in( get_peername ) if self.respond_to? :get_peername # From EventMachine::Connection
       @ip_port = "#{rip}:#{rport}"
+      Handler.log.debug "#{@ip_port} connected"
       Handler.emit('connect', self)
     end
 
     # Register listener.
-    def unbind
-      Handler.log.debug "#{ip_port} disconnected"
+    def unbind( reason=nil )
+      Handler.log.debug "#{ip_port} disconnected (#{reason})"
       emit('disconnect')
       Handler.emit('disconnect', self)
     rescue => err
@@ -74,6 +75,7 @@ module Rpc
     # when receive data, split them in lines
     def receive_data( data )
       emit( 'data_received', data )
+      # TODO: Handle when a line contains \n and when data are trunkated (buff).
       data.split("\n").map { |line|
         receive_line( line.strip )
       }

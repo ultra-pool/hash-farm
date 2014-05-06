@@ -11,7 +11,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140505144352) do
+ActiveRecord::Schema.define(version: 20140506141243) do
+
+  create_table "accounts", force: true do |t|
+    t.integer  "coin_id",               null: false
+    t.string   "address",    limit: 34, null: false
+    t.string   "label",                 null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "accounts", ["coin_id"], name: "index_accounts_on_coin_id"
+
+  create_table "coins", force: true do |t|
+    t.string   "name",                     limit: 64, null: false
+    t.string   "code",                     limit: 5,  null: false
+    t.integer  "second_per_block",                    null: false
+    t.integer  "difficulty_retarget",                 null: false
+    t.string   "algo",                     limit: 64, null: false
+    t.integer  "block_confirmation",                  null: false
+    t.integer  "transaction_confirmation",            null: false
+    t.string   "rpc_url",                             null: false
+    t.string   "bitcointalk_url"
+    t.string   "website"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "orders", force: true do |t|
     t.integer  "user_id",                                                           null: false

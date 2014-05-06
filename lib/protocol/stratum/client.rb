@@ -14,27 +14,27 @@ require_relative '../stratum'
 client = Stratum::Client.new 'otherpool.com', 3333
 
 client.on_request do |req|
-  puts "Receive #{req["id"] ? "request" : "notification"} #{req["method"]} with param=#{req["params"]}"
+  puts "Receive request##{req.id} #{req.method} with param=#{req.params}"
 end
 
 client.on('connected') do
   client.subscribe do |resp|
-    subs, extra1, extra2_size = resp["result"]
+    subs, extra1, extra2_size = resp.result
     subscriptions = Hash[ *subs ]
     puts "Subscribe to #{subscriptions.keys}"
     puts "with ids #{subscriptions.values}"
   end
 
-  client.authorize() do |resp|
-    puts resp["result"] ? "Connection authorized." : "Connection FORBIDDEN !"
+  client.authorize("toto", "foo") do |resp|
+    puts resp.result ? "Connection authorized." : "Connection FORBIDDEN !"
   end
 end
 
-client.on_mining_notify do |params|
+client.mining.on('notify') do |params|
   puts "New notification : #{params}"
 end
 
-client.on_set_difficulty do |params|
+client.mining.on('set_difficulty') do |params|
   puts "New difficulty is #{params.first}"
 end
 
@@ -48,6 +48,20 @@ end
 =end
 
 module Stratum
+  # The Client create a TCP connection to a stratum server,
+  # and emit signals when request and notification arrive.
+  #
+  # See Stratum::Handler for more informations.
+  #
+  # Signals :
+  # - connected
+  # - disconnected
+  # - reconnected
+  # Warning: Stratum::Handler has signals connect/disconnect.
+  #
+  # Methods :
+  # - connect
+  # - close
   class Client
     include Loggable
     include Listenable
@@ -58,23 +72,10 @@ module Stratum
     attr_reader :host, :port
     attr_accessor :read_socket_interval
 
-    # For debug purpose
-    attr_reader :last_difficulty, :last_notification
-
     def initialize( host, port, options={} )
       @host, @port = host, port
       @back_uri = options[:back] && URI(options[:back])
-      
       @read_socket_interval = DEFAULT_READ_SOCKET_INTERVAL
-
-      on( 'mining.set_difficulty' ) do |notif|
-        @last_difficulty = notif.params.first
-        log.verbose "Difficulty is now #{@last_difficulty}."
-      end
-      on( 'mining.notify' ) do |notif|
-        @last_notification = notif.params
-        log.verbose "Job #{@last_notification.first.inspect} received."
-      end
     end
 
     def connect
@@ -84,11 +85,33 @@ module Stratum
       emit('connected')
     end
 
+    def close
+      _stop_timer
+      _disconnect
+      unbind()
+      emit('disconnected')
+    end
+
+    def closed?
+      @socket.nil? || @socket.closed?
+    end
+
+    def inspect
+      to_s
+    end
+    def to_s
+      "#Client@%s:%d" % [host, port]
+    end
+
+    # private
+
     def reconnect
       log.warn "Connection lost to #{ip_port}. Try to reconnect..."
       _disconnect
       _connect
       emit('reconnected')
+    rescue => err
+      log.err "Fail to reconnect : #{err}\n" + err.backtrace[0..3].join("\n")
     end
 
     def read_data
@@ -106,21 +129,20 @@ module Stratum
     end
 
     def send_data data
-      print '- '; $stdout.flush
+      log_msg = "waiting socket.write..."
       if IO.select(nil, [@socket], nil, 0.5)
-        print "write..."; $stdout.flush
+        log_msg = "writing..."
         @socket.write( data )
-        puts "ed"
       else
-        puts "#{ip_port} not available"
+        log_msg "#{ip_port} not available"
         raise
       end
     rescue Errno::EPIPE, Errno::ECONNRESET, Errno::EINTR, Timeout::Error
-      log.error "Lost connection on writing..."
+      log.error "Lost connection on writing... (#{log_msg})"
       self.reconnect
       log.error "Share lost : #{data}" if data =~ /submit/
     rescue => err
-      log.error "Error during send_data to #{ip_port} : #{err}. Retry...\n#{err.backtrace[0]}"
+      log.error "Error during send_data to #{ip_port} : #{err} (#{log_msg}). Retry...\n#{err.backtrace[0]}"
       count ||= 0
       count += 1
       sleep(0.1)
@@ -128,43 +150,26 @@ module Stratum
       self.reconnect
     end
 
-    def close
-      _stop_timer
-      _disconnect
-      unbind()
-    end
-
-    def closed?
-      @socket.nil? || @socket.closed?
-    end
-
-    def inspect
-      to_s
-    end
-    def to_s
-      "#Client@%s:%d" % [host, port]
-    end
-
-    # private
-
     def _connect( host, port )
-      log.info "Connecting to #{host}:#{port}..."
+      log.info "[#{host}:#{port}] Connecting..."
       @socket = TCPSocket.new( host, port )
       _, @rport, _, @rip = @socket.peeraddr
+      log.info "[#{host}:#{port}] Connected."
     rescue => err
       log.error "Fail to connect to #{@host}:#{@port} : #{err}\n" + err.backtrace[0...5].join("\n")
       # Reraise if we were already on backup or if there is no backup.
       raise if host != @host || port != @port || @back_uri.nil?
       
       # Try to connect with backup
-      log.warn "Fail to connect @#{@host}:#{@port}. Try on backup@#{back_uri.host}:#{back_uri.port}.. (#{err})"
+      log.warn "Fail to connect @#{host}:#{port}. Try on backup@#{back_uri.host}:#{back_uri.port}.. (#{err})"
       _connect( back_uri.host, back_uri.port )
     end
 
     def _disconnect
-      log.verbose "Disconnecting..."
+      log.info "Disconnecting..."
       @socket.close if @socket
       @socket = nil
+      log.info "Disconnected."
     end
 
     def _start_timer
@@ -172,7 +177,7 @@ module Stratum
       @timer = EM.add_periodic_timer( @read_socket_interval ) do
         begin
           data = read_data
-          receive_data( data ) unless data.empty?
+          receive_data( data ) unless data.nil? || data.empty?
         rescue => err
           log.error "in read timer : #{err}\n" + err.backtrace[0..5].join("\n")
         end

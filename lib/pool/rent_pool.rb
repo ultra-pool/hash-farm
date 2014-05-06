@@ -3,7 +3,7 @@
 require 'core_extensions'
 require "protocol/stratum"
 
-require_relative './proxy_pool'
+require_relative './em_proxy_pool'
 
 # using CoreExtensions
 
@@ -15,7 +15,7 @@ require_relative './proxy_pool'
 # Signals:
 #   done
 #
-class RentPool < ProxyPool
+class RentPool < EmProxyPool
   include Loggable
   include Listenable
 
@@ -50,7 +50,7 @@ class RentPool < ProxyPool
       order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
       order.save!
     end
-    log.info "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?" if @order.price > Order::PRICE_MIN # For debug purpose
+    log.debug "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?" if @order.price > Order::PRICE_MIN # if not fake pool...
     emit('done') if done?
 
     share

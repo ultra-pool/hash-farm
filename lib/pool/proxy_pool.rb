@@ -144,7 +144,7 @@ class ProxyPool < Pool
 
   def stop
     ProxyPool.log.info "[#{name}] Stopping..."
-    return if ! started?
+    return self if ! started?
     @proxy.close
     super
     self

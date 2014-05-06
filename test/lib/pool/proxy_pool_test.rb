@@ -16,20 +16,21 @@ class ProxyPoolTest < ActiveSupport::TestCase
   end
 
   teardown do
-    EM.next_tick { @dist_pool.stop }
-    EM.add_timer(0.1) { EM.stop_event_loop }
+    EM.next_tick {
+      @dist_pool.stop
+      @dist_pool.on('stopped') { EM.stop }
+    }
   end
 
   test 'it should start and fail on subscribe' do
     proxy_pool = ProxyPool.new( "localhost", @port, @username, @password )
     # proxy_pool.on( 'error' ) do |*params| p params end
 
-    started = stopped = false
+    started = false
     error = false
 
     proxy_pool.on('error') do error = true end
     proxy_pool.on('started') do started = true end
-    proxy_pool.on('stopped') do stopped = true end
 
     EM.next_tick do
       proxy_pool.version = "n_importe_quoi"
@@ -44,29 +45,23 @@ class ProxyPoolTest < ActiveSupport::TestCase
 
     assert error
     refute started
-    assert stopped
   end
 
   test 'it should start and fail on authorize' do
     proxy_pool = ProxyPool.new( "localhost", @port, "wrong_log", "wrong_pass" )
     # proxy_pool.on( 'error' ) do |*params| p params end
 
-    started = stopped = false
+    started = false
     error = false
 
     proxy_pool.on('error') do error = true end
     proxy_pool.on('started') do started = true end
-    proxy_pool.on('stopped') do stopped = true end
 
     EM.run do proxy_pool.start end
-    sleep(0.5)
-
-    EM.run do proxy_pool.stop end
     sleep(0.1)
 
     assert error
     refute started
-    assert stopped
   end
 
   test 'it should start correctly' do
@@ -81,7 +76,7 @@ class ProxyPoolTest < ActiveSupport::TestCase
     proxy_pool.on('stopped') do stopped = true end
 
     EM.run do proxy_pool.start end
-    sleep(0.5)
+    sleep(0.2)
 
     EM.run do proxy_pool.stop end
     sleep(0.1)
@@ -99,9 +94,10 @@ class ProxyPoolTest < ActiveSupport::TestCase
     proxy_pool.expects( :on_pool_notify ).once
 
     EM.next_tick do proxy_pool.start end
-    sleep(0.5)
+    sleep(0.2)
 
     EM.next_tick do proxy_pool.stop end
+    sleep(0.1)
   end
 
   test 'it should return default profitability' do

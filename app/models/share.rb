@@ -40,12 +40,10 @@ class Share < ActiveRecord::Base
 
       check_params
 
-      self.pool = job.pool
       self.worker_id = worker.model.id
       self.difficulty = worker.jobs_pdiff[ @job_id ]
       self.solution = to_hash
       self.our_result = match_difficulty( self.difficulty )
-      self.is_block = match_nbits( @nbits )
     end
   end
 

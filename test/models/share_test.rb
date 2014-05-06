@@ -123,7 +123,6 @@ class ShareTest < ActiveSupport::TestCase
       solution: "00000000ffff0000000000000000000000000000000000000000000000000001",
     )
     share.our_result = share.match_difficulty( share.difficulty )
-    share.is_block = share.match_nbits( @nbits )
 
     refute share.our_result
     refute share.valid_share?

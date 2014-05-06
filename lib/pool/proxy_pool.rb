@@ -215,32 +215,32 @@ class ProxyPool < Pool
       extra_nonce_2 = worker.extra_nonce_1[@extra_nonce_1.size...@extra_nonce_1.size+@proxy_extra_nonce_2_size*2] # hex to byte
       extra_nonce_2 += share.extra_nonce_2
       pool_job = [@username, job_id, extra_nonce_2, ntime, nonce]
-      ProxyPool.log.debug("Send back pool job : #{pool_job}")
+      ProxyPool.log.debug("[#{@name}] Send back pool job : #{pool_job}")
       @proxy.mining.submit( *pool_job ) do |resp|
         if resp.result?
           @accepted_shares += 1
-          ProxyPool.log.info "#{job_id}/#{share.ident}@#{worker.name} Accepted by pool"
+          ProxyPool.log.info "[#{@name}]#{job_id}/#{share.ident}@#{worker.name} Accepted by pool"
           share.pool_result = true
         else
           @rejected_shares += 1
-          ProxyPool.log.warn "#{job_id}/#{share.ident}@#{worker.name} Not accepted by pool : #{resp.error}"
+          ProxyPool.log.warn "[#{@name}]#{job_id}/#{share.ident}@#{worker.name} Not accepted by pool : #{resp.error}"
           share.pool_result = false
           share.reason = resp.error.to_s
         end
         if share.valid?
           share.save!
         else
-          log.error "Share invalid before save ! #{share.to_json}"
+          ProxyPool.log.error "[#{@name}] Share invalid before save ! #{share.to_json}"
         end
       end
     end
 
     share
   rescue ArgumentError => err
-    ProxyPool.log.warn "[#{worker.name}] Fail on submit : #{err}\n" + err.backtrace[0...5].join("\n")
+    ProxyPool.log.warn "[#{@name}][#{worker.name}] Fail on submit : #{err}\n" + err.backtrace[0...5].join("\n")
     nil
   rescue => err
-    ProxyPool.log.error "#{err}\n" + err.backtrace[0..5].join("\n")
+    ProxyPool.log.error "[#{@name}] #{err}\n" + err.backtrace[0..5].join("\n")
     ProxyPool.log.error "worker=#{worker.inspect}"
     ProxyPool.log.error "share=#{share.inspect}"
     nil

@@ -109,10 +109,10 @@ class Pool
 
     # Check share is valid
     if share.valid_share?
-      Pool.log.verbose "Valid share from #{worker.name}."
+      Pool.log.verbose "[#{@name}] Valid share from #{worker.name}."
       req.respond( true )
     else
-      Pool.log.verbose "Bad share from #{worker.name} : #{share.to_hash}"
+      Pool.log.verbose "[#{@name}] Bad share from #{worker.name} : #{share.to_hash}"
       req.respond( false )
     end
 

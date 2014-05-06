@@ -54,7 +54,7 @@ module Rpc
     def post_init
       @skip_jsonrpc_field = true
       @response_waited = {} # ID => Callback
-      @rport, @rip = Socket.unpack_sockaddr_in( get_peername ) if self.respond_to? :get_peername # From EventMachine::Connection
+      @rport, @rip = Socket.unpack_sockaddr_in( get_peername ) if self.respond_to?( :get_peername ) && get_peername.present? # From EventMachine::Connection
       @ip_port = "#{rip}:#{rport}"
       Handler.log.debug "#{@ip_port} connected"
       Handler.emit('connect', self)

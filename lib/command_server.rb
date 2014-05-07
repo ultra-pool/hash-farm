@@ -44,13 +44,13 @@ module PM
             price = Float( req.params[2] ) rescue 0.001
             limit = Float( req.params[3] ) rescue nil
             prev_hashrate = [@ms.hashrate * 10**-6, limit || Float::INFINITY].min
-            puts "New RentPool @#{URI(url).host} for ~#{(pay / price * 1.day / prev_hashrate).fround} s at #{prev_hashrate} MHs"
             order = Order.new(user_id: 1, url: url, pay: pay, price: price, limit: limit)
             if order.valid?
-              @ms.add_rent_pool( order )
-              req.respond true
+              order.save!
+              @ms.check_orders
+              req.respond "New RentPool @#{URI(url).host} for ~#{(pay / price * 1.day / prev_hashrate).fround} s at #{prev_hashrate} MHs"
             else
-              req.respond false
+              req.respond order.errors.messages
             end
           when "reload"
             Dir["lib/*.rb"].each { |f|
@@ -100,7 +100,7 @@ module PM
       if @ms.current_pool
         s.puts "- current pool : #{@ms.current_pool.name}"
       else
-        @ms.pools.each do |p|
+        @ms.pools.sort.reverse.each do |p|
           s.puts p.to_s
           # s.puts "- #{p.name} :"
           # s.puts "\t* %d workers, %.1f MH/s" % [p.workers.size, p.hashrate * 10**-6]

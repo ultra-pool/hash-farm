@@ -173,11 +173,7 @@ class Pool
     worker.off( self, 'pool_changed' )
     update_desired_share_rate_per_worker
 
-    if @workers.size == 0
-      emit( "empty" )
-    elsif self.hashrate < HashFarm.config.min_pool_hashrate
-      emit( "low_hashrate" )
-    end
+    emit( "empty" ) if @workers.size == 0
   end
 
   # If keep_last_one is false, remove all jobs before last clean_jobs
@@ -213,7 +209,7 @@ class Pool
 
   def to_s
     nb_max = 3
-    s = "%s : %d workers, %.1f MH/s, %.1f BTC/MHs/day" % [@name, @workers.size, hashrate * 10**-6, profitability]
+    s = "%s : %d workers, %.1f MH/s, %.1f mBTC/MHs/day" % [@name, @workers.size, hashrate * 10**-6, profitability.to_mbtc]
     return s if @workers.size == 0
     s += " " + @workers[0...nb_max].map(&:name).to_s
     s += "...%d more]" % (@workers.size - nb_max) if @workers.size > nb_max

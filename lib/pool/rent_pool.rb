@@ -30,27 +30,27 @@ class RentPool < EmProxyPool
   end
 
   def start
-    order.set_running( true )
+    @order.set_running( true )
     super
   end
 
   def stop
     super
-    order.set_complete if done?
-    order.set_running( false )
+    @order.set_complete if done?
+    @order.set_running( false )
   end
 
   def submit worker, req
     share = super
     return nil if share.nil?
 
-    share.order = order
+    share.order = @order
     share.save!
     if share.valid_share? && @order.price > Order::PRICE_MIN # TODO: remove last test. For debug purpose
-      order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
-      order.save!
+      @order.hash_done += MiningHelper.difficulty_to_nb_hash( share.difficulty )
+      @order.save!
     end
-    log.debug "total_hash is now #{order.hash_done}. >= #{order.hash_done >= @order.hash_to_do} ?" if @order.price > Order::PRICE_MIN # if not fake pool...
+    log.debug "total_hash is now #{@order.hash_done}. >= #{@order.hash_done >= @order.hash_to_do} ?" if @order.price > Order::PRICE_MIN # if not fake pool...
     emit('done') if done?
 
     share
@@ -64,7 +64,7 @@ class RentPool < EmProxyPool
     if self.done?
       0.0
     else
-      order.price
+      @order.price
     end
   end
 

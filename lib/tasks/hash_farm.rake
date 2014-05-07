@@ -11,7 +11,7 @@ namespace :hash_farm do
     puts "Master public serialized: " + master.to_serialized_address(:public)
     puts "Master private serialized: " + master.to_serialized_address(:private)
   end
-    
+
   desc "Start a HashFarm instance."
   task :start => :environment do |t|
     require 'pool/main_server'
@@ -20,13 +20,19 @@ namespace :hash_farm do
     pm_server = MainServer.instance
     pm_server.start
 
+    # pm_server.on( 'stopped' ) { EM.stop }
+    pm_server.on( 'stopped' ) {
+      puts "\033[31m[%s][HashFarm] PM stopped. Going to stop EM..\033[0m" % Time.now.strftime("%T")
+      EM.next_tick { EM.stop }
+    }
+
     Signal.trap("TERM") do
-      puts "'TERM' signal received. Going to shutdown HashFarm..."
-      EM.add_timer(0) { pm_server.stop; EM.stop }
+      puts "\033[31m[%s][HashFarm] 'TERM' signal received. Going to shutdown HashFarm...\033[0m" % Time.now.strftime("%T")
+      EM.add_timer(0) { pm_server.stop }
     end
     Signal.trap("INT") do
-      puts "'INT' signal received. Going to shutdown HashFarm..."
-      EM.add_timer(0) { pm_server.stop; EM.stop }
+      puts "\033[31m[%s][HashFarm] 'INT' signal received. Going to shutdown HashFarm...\033[0m" % Time.now.strftime("%T")
+      EM.add_timer(0) { pm_server.stop }
     end
 
     EM.reactor_thread.join

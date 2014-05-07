@@ -137,15 +137,14 @@ module Stratum
     end
 
     def stop
+      return if ! @started
+      @started = false
       EM.next_tick do
         EventMachine.stop_server( @server_signature ) rescue nil
-        @started = false
+        Server.log.info "Stratum::Server on #{host}:#{port} stopped."
         emit( 'stopped' )
       end
-      # Server.log.info "Stratum::Server on #{host}:#{port} stopped." # can't be called from trap context (ThreadError)
       Stratum::Handler.off(self, 'connect')
-      # ObjectSpace.each_object(@handler) do |cxn| cxn.close end
-      Stratum::Handler.off(self, 'disconnect')
       self
     end
 

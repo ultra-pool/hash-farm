@@ -119,6 +119,7 @@ class EmProxyPool < Pool
   alias_method :pool_start, :start
   def start
     EmProxyPool.log.info "[#{name}] Starting..."
+    return self if started?
     @proxy = EM.connect( @host, @port, Stratum::Handler.dup )
     init_proxy_listeners
     authentify
@@ -126,7 +127,7 @@ class EmProxyPool < Pool
     # Rescue if fail to authentify.
     EM.add_timer( 30.seconds ) do
       if ! self.authentified
-        log.error "[#{name}] Fail to authentify. Retry"
+        EmProxyPool.log.error "[#{name}] Fail to authentify. Retry"
         stop
         EM.add_timer( 10.seconds ) do start end
       end

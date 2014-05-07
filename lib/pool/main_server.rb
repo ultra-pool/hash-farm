@@ -66,12 +66,34 @@ class MainServer < Stratum::Server
 
   # => self
   def stop
+    MainServer.log.info "Stopping..."
+
     EM.next_tick do
+      # Stop servers
       EM.stop_server( @command_server )
       MainServer.log.info "CommandServer stopped."
+      # EventMachine.stop_server( @server_signature ) rescue nil
+      # MainServer.log.info "Stratum::Server on #{host}:#{port} stopped."
+      #
+      # # Stop pools
+      # if @pools.empty?
+      #   emit( 'pool_empty' )
+      # else
+      #   @pools.each do |pool| delete_pool(pool) end
+      # end
     end
+
+    # Stratum::Handler.off(self, 'connect')
+    # self.on( 'pools_empty' ) do
+    #   off( self, 'pools_empty' )
+    #   puts "emitting stopped"
+    #   emit( 'stopped' )
+    # end
+    # self
+
+    @pools.each { |pool| delete_pool( pool ) }
+
     super
-    @pools.each(&:stop)
   end
 
   # => pool
@@ -91,10 +113,28 @@ class MainServer < Stratum::Server
     MainServer.log.error "in add_pool : #{err}"
     MainServer.log.error err.backtrace.join("\n")
   end
-  
+
   def delete_pool( pool )
+    pool.off( self )
     @pools.delete( pool )
     pool.workers.each do |w| w.pool = choose_pool_for_new_worker end
+    pool.stop
+
+    # pool.on( 'empty' ) do
+    #   puts "in delete_pool, pool empty !"
+    #   pool.stop
+    # end
+    # pool.on( 'stopped' ) do
+    #   puts "in delete_pool, pool stopped ! empty=#{@pools.empty?}"
+    #   emit( 'pools_empty' ) if @pools.empty?
+    # end
+    # puts "#{pool.workers.size} workers, #{@pools.size} pools"
+    # if pool.workers.empty?
+    #   pool.stop
+    # else
+    #   pool.workers.each do |w| w.pool = choose_pool_for_new_worker end
+    # end
+
     pool
   end
 

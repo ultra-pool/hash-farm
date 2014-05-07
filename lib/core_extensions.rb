@@ -34,6 +34,18 @@
       (self * 10**8).round
     end
 
+    def to_mbtc( precision=1 )
+      (self * 10**3).round( precision )
+    end
+
+    def to_ubtc( precision=1 )
+      (self * 10**6).round( precision )
+    end
+
+    def to_satoshi
+      (self * 10**8).round
+    end
+
     def khash
       (self * 10**3).round
     end

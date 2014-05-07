@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  amount: 0.5
+  sender_id: 
+  recipient_id: barbu
+  txid: MyString
+  vout: 1
+
+two:
+  amount: 0.1
+  sender_id: barbu
+  recipient_id: mv
+  txid: 
+  vout: 

@@ -51,7 +51,7 @@ class CoreExtensionsTest < ActiveSupport::TestCase
     assert_equal 123000000, 1.23.btc
   end
 
-  test "numeric should include btc units" do
+  test "numeric should include to_btc units" do
     assert_equal 10**3, 1.to_mbtc
     assert_equal 1.2 * 10**3, 1.2.to_mbtc(1)
     assert_equal 10**6, 1.to_ubtc

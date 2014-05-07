@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140506141243) do
+ActiveRecord::Schema.define(version: 20140507164313) do
 
   create_table "accounts", force: true do |t|
     t.integer  "coin_id",               null: false
@@ -69,6 +69,19 @@ ActiveRecord::Schema.define(version: 20140506141243) do
   end
 
   add_index "shares", ["order_id"], name: "index_shares_on_order_id"
+
+  create_table "transfers", force: true do |t|
+    t.decimal  "amount",       precision: 16, scale: 8, null: false
+    t.integer  "sender_id"
+    t.integer  "recipient_id"
+    t.string   "txid"
+    t.integer  "vout"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "transfers", ["recipient_id"], name: "index_transfers_on_recipient_id"
+  add_index "transfers", ["sender_id"], name: "index_transfers_on_sender_id"
 
   create_table "users", force: true do |t|
     t.string   "name",                   limit: 64

@@ -2,14 +2,36 @@
 
 one:
   amount: 0.5
-  sender_id: 
-  recipient_id: barbu
-  txid: MyString
+  sender:
+  recipient: one
+  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1
 
 two:
   amount: 0.1
-  sender_id: barbu
-  recipient_id: mv
+  sender: one
+  recipient: two
   txid: 
   vout: 
+
+in1:
+  amount: 1
+  recipient: barbu
+  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
+  vout: 1
+
+tf1:
+  amount: 0.5
+  sender: barbu
+  recipient: toto
+
+tf2:
+  amount: 0.5
+  sender: barbu
+  recipient: toto
+
+out1:
+  amount: 0.8
+  sender: toto
+  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
+  vout: 1

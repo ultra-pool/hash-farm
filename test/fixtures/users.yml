@@ -21,6 +21,11 @@ barbu:
   is_anonymous: false
   is_admin: true
 
+toto:
+  payout_address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh
+  is_anonymous: false
+  is_admin: false
+
 mv:
   id: 42
   name: mv

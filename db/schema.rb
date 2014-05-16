@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140507164313) do
+ActiveRecord::Schema.define(version: 20140516110430) do
 
   create_table "accounts", force: true do |t|
     t.integer  "coin_id",               null: false
@@ -38,6 +38,12 @@ ActiveRecord::Schema.define(version: 20140507164313) do
     t.datetime "updated_at"
   end
 
+  create_table "miners", force: true do |t|
+    t.string   "address",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "orders", force: true do |t|
     t.integer  "user_id",                                                           null: false
     t.string   "algo",       limit: 32,                          default: "scrypt", null: false
@@ -52,6 +58,7 @@ ActiveRecord::Schema.define(version: 20140507164313) do
     t.boolean  "running",                                        default: false,    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.decimal  "paid",                  precision: 16, scale: 8, default: 0.0,      null: false
   end
 
   add_index "orders", ["user_id"], name: "index_orders_on_user_id"
@@ -66,9 +73,11 @@ ActiveRecord::Schema.define(version: 20140507164313) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "order_id"
+    t.integer  "transfer_id"
   end
 
   add_index "shares", ["order_id"], name: "index_shares_on_order_id"
+  add_index "shares", ["transfer_id"], name: "index_shares_on_transfer_id"
 
   create_table "transfers", force: true do |t|
     t.decimal  "amount",       precision: 16, scale: 8, null: false
@@ -84,22 +93,17 @@ ActiveRecord::Schema.define(version: 20140507164313) do
   add_index "transfers", ["sender_id"], name: "index_transfers_on_sender_id"
 
   create_table "users", force: true do |t|
-    t.string   "name",                   limit: 64
     t.string   "password",               limit: 64
     t.string   "email"
-    t.string   "payout_address",         limit: 34,                                          null: false
-    t.boolean  "is_anonymous",                                                               null: false
-    t.boolean  "is_admin",                                                                   null: false
+    t.boolean  "is_admin",                                       null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "balance",                                                    default: 0
     t.string   "wallet_address",         limit: 34
-    t.decimal  "min_price",                         precision: 16, scale: 8, default: 0.001, null: false
-    t.string   "encrypted_password",                                         default: "",    null: false
+    t.string   "encrypted_password",                default: "", null: false
     t.string   "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",                                              default: 0,     null: false
+    t.integer  "sign_in_count",                     default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip"
@@ -115,13 +119,11 @@ ActiveRecord::Schema.define(version: 20140507164313) do
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
 
   create_table "workers", force: true do |t|
-    t.integer  "user_id",                 null: false
-    t.string   "name",         limit: 63
-    t.boolean  "is_anonymous",            null: false
+    t.string   "name",       limit: 63
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "miner_id"
+    t.decimal  "min_price",             precision: 16, scale: 8, default: 0.001, null: false
   end
-
-  add_index "workers", ["user_id"], name: "index_workers_on_user_id"
 
 end

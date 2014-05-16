@@ -17,8 +17,6 @@ class WorkerConnection < EM::Connection
   SMALLEST_DIFFICULTY = 2**-16 # Mini CGMiner pool diff.
   NB_SHARE_MEAN = 10
 
-  attr_accessor :worker
-
   #### READ-ONLY
   # Hash of String notification => String UUID
   attr_reader :subscriptions
@@ -36,8 +34,6 @@ class WorkerConnection < EM::Connection
   attr_reader :created_at
 
   #### READ / WRITE
-  # String
-  attr_accessor :name
   # Worker
   attr_reader :model
   # Pool
@@ -68,7 +64,6 @@ class WorkerConnection < EM::Connection
   def post_init
     super
     init_listeners
-    update_name
   end
 
   def init_listeners
@@ -89,7 +84,6 @@ class WorkerConnection < EM::Connection
     @pool = worker.pool
     @type = worker.type
     @model = worker.model
-    @name = worker.name
     @skip_jsonrpc_field = worker.skip_jsonrpc_field
     @response_waited = worker.response_waited
   end
@@ -144,7 +138,6 @@ class WorkerConnection < EM::Connection
   def model=( worker )
     log.debug("[#{name}] model found")
     @model = worker
-    update_name
     worker
   end
 
@@ -204,10 +197,6 @@ class WorkerConnection < EM::Connection
 
   ##########################################################
 
-  def payout_address
-    @model.user.payout_address rescue nil
-  end
-
   def valid_shares
     shares.select(&:valid_share?)
   end
@@ -240,7 +229,7 @@ class WorkerConnection < EM::Connection
       time = Time.now - shares[-NB_SHARE_MEAN].created_at
       rate = (sum_diff / time * 2 ** 32).round
     end
-    log.debug "[" + @name + "] hashrate is " + rate.to_s
+    log.debug "[" + name + "] hashrate is " + rate.to_s
     rate
   end
 
@@ -254,7 +243,7 @@ class WorkerConnection < EM::Connection
       valid_rate = vshares[-NB_SHARE_MEAN..-1].map { |s| s.worker_difficulty }.inject(:+) / (Time.now - vshares[-NB_SHARE_MEAN].created_at) * 2 ** 32
     end
     valid_rate = valid_rate.round
-    log.debug "[" + @name + "] valid_hashrate is " + valid_rate.to_s
+    log.debug "[" + name + "] valid_hashrate is " + valid_rate.to_s
     valid_rate
   end
 
@@ -272,28 +261,21 @@ class WorkerConnection < EM::Connection
       invalid_rate = sum_diff / time * 2 ** 32
     end
     invalid_rate = invalid_rate.round
-    log.debug "[" + @name + "] invalid_hashrate is " + invalid_rate.to_s
+    log.debug "[" + name + "] invalid_hashrate is " + invalid_rate.to_s
     invalid_rate
   end
 
   def inspect
-    "%s@%s<en1: '%s', en2size: %d, hrate: %d kHps, pool: %s>" % [@name, @ip_port, @extra_nonce_1, @extra_nonce_2_size, (hashrate / 1000 rescue -1), @pool && @pool.name]
+    "%s@%s<en1: '%s', en2size: %d, hrate: %d kHps, pool: %s>" % [name, @ip_port, @extra_nonce_1, @extra_nonce_2_size, (hashrate / 1000 rescue -1), @pool && @pool.name]
   end
 
-  def update_name
-    if rip =~ /^192.168.0.(\d+)$/
-      @name = "EPIC-#{$~[1]}"
-      @name += "-" + payout_address[0..3] if payout_address.present?
-    elsif @model && @model.name.present? && @model.user.name.present?
-      @name = @model.fullname
-    elsif @model && @model.user.name.present?
-      @name = @model.user.name + "@" + rport
-    elsif @model && @model.name.present?
-      @name = @model.user.payout_address[0...8] + "@" + rport
-    elsif @payout_address
-      @name = @model.user.payout_address[0...8] + "@" + rport
+  def name
+    if rip =~ /^192.168.\d+.(\d+)$/
+      "EPIC-#{$~[1]}"
+    elsif @model.blank?
+      ip_port
     else
-      @name = ip_port
+      @model.fullname + "@" + rport
     end
   end
 end

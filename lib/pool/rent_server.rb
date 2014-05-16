@@ -74,7 +74,7 @@ class RentServer < MainServer
       return req.respond( false )
     else
       super
-      worker.model.user.min_price = min_price if min_price.present?
+      worker.model.min_price = min_price if min_price.present?
     end
   end
 

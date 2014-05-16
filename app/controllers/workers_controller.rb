@@ -69,6 +69,6 @@ class WorkersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def worker_params
-      params.require(:worker).permit(:user_id, :name, :is_anonymous)
+      params.require(:worker).permit(:miner_id, :name)
     end
 end

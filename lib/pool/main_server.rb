@@ -161,8 +161,8 @@ class MainServer < Stratum::Server
     payout_address, worker_name = username.split('.')
     return req.respond( false ) if ! Bitcoin.valid_address?( payout_address )
 
-    user = User.find_or_create_by!( payout_address: payout_address )
-    worker.model = Worker.find_or_create_by!( user_id: user.id, name: worker_name )
+    miner = Miner.find_or_create_by!( address: payout_address )
+    worker.model = Worker.find_or_create_by!( miner_id: miner.id, name: worker_name )
 
     req.respond( true )
     MainServer.log.verbose "[#{worker.name}] authorized => #{worker.name}."

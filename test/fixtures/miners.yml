@@ -1,0 +1,10 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  address: mkyoyvAQTzQFd8tr7D9uPT9co1Qj88nstD
+
+two:
+  address: mqzLSYtjPgxYu67UjzsjXycpGno5nHv6tP
+
+barbu:
+  address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh

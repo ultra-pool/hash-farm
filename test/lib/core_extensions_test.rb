@@ -52,10 +52,12 @@ class CoreExtensionsTest < ActiveSupport::TestCase
   end
 
   test "numeric should include to_btc units" do
-    assert_equal 10**3, 1.to_mbtc
-    assert_equal 1.2 * 10**3, 1.2.to_mbtc(1)
-    assert_equal 10**6, 1.to_ubtc
-    assert_equal 10**8, 1.to_satoshi
+    assert_equal 123.45678, 12345678.to_mbtc
+    assert_equal 123.5, 12345678.to_mbtc(1)
+    assert_equal 123457.8, 12345678.to_ubtc
+    assert_equal 12345678, 12345678.to_satoshi
+    assert_equal 0.12345678, 12345678.to_btc
+    assert_equal 0.123, 12345678.to_btc(3)
   end
 
   test "numeric should include hash units" do

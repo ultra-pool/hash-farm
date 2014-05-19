@@ -51,6 +51,7 @@ class ShareTest < ActiveSupport::TestCase
     @submit = Stratum::Submit.new( "toto", "a", @extra_nonce_2, @ntime.to_hex(4), @nonce.to_hex(4).reverse_hex )
 
     @share = Share.new( @worker, @job, @submit )
+    @share.order = orders(:one)
   end
 
   test "initialize" do
@@ -128,25 +129,45 @@ class ShareTest < ActiveSupport::TestCase
     refute share.valid_share?
   end
 
+  test "transfer assignment should raise when not payable" do
+    assert @share.valid_share?
+    assert @share.transfer.nil?
+    refute @share.paid?
+    assert @share.payable?
+
+    @share.transfer = Transfer.create!( miner: miners(:one), order: orders(:one), amount: 1 )
+
+    assert @share.valid_share?
+    assert @share.transfer_id.present?
+    assert @share.transfer.present?
+    assert @share.paid?
+    refute @share.payable?
+
+    assert_raises RuntimeError do
+      @share.transfer = Transfer.new( miner: miners(:one), order: orders(:one), amount: 1 )
+    end
+  end
+
+  # add test_ before ?
   def valid_block?
-    assert @share.is_valid_block?
+    assert @share.valid_block?
     
     share = ShareTool.new( @worker, @job, @submit )
     
     # == share_target, share_diff == 1
     share.stubs(to_hash: "00000000ffff0000000000000000000000000000000000000000000000000000")
-    refute share.is_valid_block?
+    refute share.valid_block?
     # == block_target
     target = Bitcoin.decode_compact_bits @nbits.hex
     share.stubs(to_hash: target)
-    assert share.is_valid_block?
+    assert share.valid_block?
     # == block_target + 1
     target = (target.hex + 1).to_hex(32)
     share.stubs(to_hash: target)
-    refute share.is_valid_block?
+    refute share.valid_block?
   end
 
-  def genesis_share
+  def genesshare
     # skip("Must be adapted to Litecoin Genesis instead of Bitcoin Genesis")
     version     = 1
     previous_hash  = 0x0000000000000000000000000000000000000000000000000000000000000000
@@ -200,8 +221,8 @@ class ShareTest < ActiveSupport::TestCase
     headerHash = "2cafd4ed55676991f0777058fef290710887fa2055816cf0f61514a805000000" 
     blockHex = "010000006288c6047fe03367cc80dfad96dc959510950c128174d21b9f32bcd2cf3c271a3f6cb48f87404b527c050f889da2e0110fef53c7c5a72f1928b745bd29519ffcef5314534844091d6677320b0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff270393550d062f503253482f040e541453081fffffff000000000d2f6e6f64655374726174756d2f000000000100f2052a010000001976a91468774ccce28e268ff0d350d8c4978c48c2e06c2488ac00000000"
 
-    assert share.is_valid_share?
-    assert share.is_valid_block?
+    assert share.valid_share?
+    assert share.valid_block?
 
     assert_equal coinbaseBuffer, share.coinbase_hex
     assert_equal blockHex[0...160], share.to_hex

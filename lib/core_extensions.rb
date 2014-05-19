@@ -17,6 +17,10 @@
       r
     end
 
+    def floor(precision=0)
+      (self * 10**precision).floor * 10**-precision
+    end
+
     def satoshi
       self.round
     end
@@ -34,16 +38,20 @@
       (self * 10**8).round
     end
 
-    def to_mbtc( precision=1 )
-      (self * 10**3).round( precision )
+    def to_btc( precision=8 )
+      (self * 10**-8).round( precision ).to_f
     end
 
-    def to_ubtc( precision=1 )
-      (self * 10**6).round( precision )
+    def to_mbtc( precision=5 )
+      (self * 10**-5).round( precision ).to_f
+    end
+
+    def to_ubtc( precision=2 )
+      (self * 10**-2).round( precision ).to_f
     end
 
     def to_satoshi
-      (self * 10**8).round
+      self
     end
 
     def khash

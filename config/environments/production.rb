@@ -80,6 +80,11 @@ HashFarm::Application.configure do
 
   ############################################################################
 
+  config.pool = OpenStruct.new
+  config.pool.fees_user = User.find_or_create!(payout_address: "186e2PUgDoEZ14t25wYN8x1Ry5gtV3Qvj1")
+  config.pool.fees_percent = 2.0
+  config.pool.min_payout = 0.005
+
   config.main_server = OpenStruct.new
   config.main_server.host = "0.0.0.0"
   config.main_server.port = 3333

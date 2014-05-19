@@ -22,3 +22,7 @@ mv:
   email: mv@mail.com
   is_admin: true
 
+buyer:
+  password: toto
+  wallet_address: mxeNk8TKSVXiBDntJB5tB1KhAv26dURzHh
+  is_admin: false

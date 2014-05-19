@@ -11,11 +11,16 @@ class Share < ActiveRecord::Base
   belongs_to :order
   has_one :miner, through: :worker
   
+  # VALIDATION
+
   validates :order, presence: true
+
+  # SCOPES
 
   scope :unpaid, -> { where( 'transfer_id IS NULL' ) }
   scope :paid, -> { where( 'transfer_id IS NOT NULL' ) }
   scope :accepted, -> { where(our_result: true) }
+  scope :payable, -> { unpaid.accepted }
 
   attr_reader :version, :previous_hash, :merkle_root, :nbits, :ntime, :nonce
   # :coinb1, :coinb2, :extra_nonce_1, :extra_nonce_2 are big-endian hex strings
@@ -46,6 +51,20 @@ class Share < ActiveRecord::Base
       self.solution = to_hash
       self.our_result = match_difficulty( self.difficulty )
     end
+  end
+
+  def transfer=( tf )
+    raise TypeError, "transfer= wait a Transfer, not a #{tf.class}" if ! tf.kind_of?( Transfer )
+    raise RuntimeError, "share is not payable !" if ! payable?
+    super
+  end
+
+  def paid?
+    transfer.present?
+  end
+
+  def payable?
+    valid_share? && ! paid?
   end
 
   def match_difficulty( diff )

@@ -11,3 +11,11 @@ two:
 barbu1:
   miner: :barbu
   name: barbu1
+
+barbu2:
+  miner: :barbu
+  name: barbu2
+
+toto1:
+  miner: :barbu
+  name: toto1

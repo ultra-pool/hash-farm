@@ -1,10 +1,8 @@
 class RemovePayoutAddressNotNullOption < ActiveRecord::Migration
-  def change
+  def up
+    change_column_null(:users, :payout_address, true)
   end
-  def self.up
-    change :user, :payout_address, :string, limit: 34
-  end
-  def self.down
-    change :user, :payout_address, :string, limit: 34, null: false
+  def down
+    change_column_null(:users, :payout_address, false)
   end
 end

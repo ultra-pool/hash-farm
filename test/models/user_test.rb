@@ -23,6 +23,10 @@ class UserTest < ActiveSupport::TestCase
     assert_equal('f4202564a4b5d6d8dcd0eb8ce7bc889ac156ac87822c833779a3be1bee1c1baa', u.deposit_key.priv)
   end
 
-  
-
+  test "it should compute balances" do
+    assert_equal 0.01, users(:buyer).balance
+    assert_equal 0, users(:barbu).balance
+    assert_equal 0, users(:toto).balance
+    assert_equal 0.5, users(:one).balance
+  end
 end

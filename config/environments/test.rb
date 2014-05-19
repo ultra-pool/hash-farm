@@ -33,4 +33,12 @@ HashFarm::Application.configure do
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
+
+  ############################################################################
+
+  config.pool = OpenStruct.new
+  config.pool.fees_address = "186e2PUgDoEZ14t25wYN8x1Ry5gtV3Qvj1"
+  config.pool.fees_percent = 2.0
+  config.pool.min_payout = 0.005
+
 end

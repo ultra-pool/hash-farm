@@ -12,11 +12,11 @@ class TransferTest < ActiveSupport::TestCase
   end
 
   test "it should assert amount is present" do
-    assert Transfer.new( user: @barbu, miner: @toto, amount: @amount, order: @order ).valid?
-    assert Transfer.new( user: @barbu, miner: @toto, amount: 0.000000001, order: @order ).invalid?
-    assert Transfer.new( user: @barbu, miner: @toto, amount: nil, order: @order ).invalid?
-    assert Transfer.new( user: @barbu, miner: @toto, amount: "toto", order: @order ).invalid?
-    assert Transfer.new( user: @barbu, miner: @toto, order: @order ).invalid?
+    assert Transfer.new( user: @barbu, amount: @amount, order: @order ).valid?
+    assert Transfer.new( user: @barbu, amount: 0.000000001, order: @order ).invalid?
+    assert Transfer.new( user: @barbu, amount: nil, order: @order ).invalid?
+    assert Transfer.new( user: @barbu, amount: "toto", order: @order ).invalid?
+    assert Transfer.new( user: @barbu, order: @order ).invalid?
   end
 
   test "it should check txid format" do
@@ -40,19 +40,23 @@ class TransferTest < ActiveSupport::TestCase
     assert Transfer.new( user: @barbu, miner: @toto, vout: @vout, amount: @amount ).invalid?
   end
 
-  test "it should assert_2_and_only_2_of_user_miner_and_txid_are_present" do
-    assert Transfer.new( user: @barbu, miner: @toto, amount: @amount, order: @order ).valid?
+  test "it should assert_user_or_miner_is_present" do
+    assert Transfer.new( user: @barbu, amount: @amount, order: @order ).valid?
     assert Transfer.new( user: @barbu, txid: @txid, vout: @vout, amount: @amount ).valid?
     assert Transfer.new( miner: @toto, txid: @txid, vout: @vout, amount: @amount ).valid?
+    assert Transfer.new( miner: @toto, amount: @amount, order: @order ).valid?
 
-    assert Transfer.new( user: @barbu, amount: @amount ).invalid?
-    assert Transfer.new( miner: @toto, amount: @amount ).invalid?
     assert Transfer.new( txid: @txid, vout: @vout, amount: @amount ).invalid?
     assert Transfer.new( user: @barbu, miner: @toto, txid: @txid, vout: @vout, amount: @amount ).invalid?
   end
 
+  test "it should assert_amount_has_no_satoshi_decimal" do
+    assert Transfer.new( user: @barbu, order: @order, amount: @amount ).valid?
+    refute Transfer.new( user: @barbu, order: @order, amount: @amount + 10**-9 ).valid?
+  end
+
   test "it should get credits" do
-    assert_equal 2, Transfer.credits.size
+    assert_equal 3, Transfer.credits.size
   end
 
   test "it should get order_creations" do
@@ -75,16 +79,21 @@ class TransferTest < ActiveSupport::TestCase
     assert_equal 1, Transfer.withdraws.size
   end
 
-  test "it should scope from" do
-    tfs = Transfer.from( @barbu )
-    # assert Transfer.all.all? { |tf| tf.valid? || puts( tf.errors.inspect ) }
-    assert_equal 5, tfs.size
+  test "it should scope of a user" do
+    tfs = Transfer.of( @barbu )
+    assert_equal 3, tfs.size
     assert tfs.all? { |tf| tf.user == @barbu }
   end
 
-  test "it should scope to" do
-    tfs = Transfer.to( @toto )
+  test "it should scope of a miner" do
+    tfs = Transfer.of( @toto )
     assert_equal 3, tfs.size
-    assert tfs.all? { |tf| tf.miner == @toto }, tfs.map(&:inspect).join("\n")
+    assert tfs.all? { |tf| tf.miner == @toto }
+  end
+
+  test "it should scope of an order" do
+    tfs = Transfer.of( @order )
+    assert_equal 3, tfs.size
+    assert tfs.all? { |tf| tf.order == @order }
   end
 end

@@ -7,19 +7,10 @@ one:
   txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1
 
-one:
-  amount: 0.5
-  user: one
-  miner:
-  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
-  vout: 1
-
 two:
-  amount: -0.1
-  user: one
+  amount: 0.1
   miner: two
-  txid: 
-  vout: 
+  order: two
 
 in1:
   amount: 2
@@ -33,19 +24,17 @@ order1:
   order: one
 
 tf1:
-  amount: -0.5
-  user: barbu
+  amount: 0.5
   miner: toto
   order: one
 
 tf2:
-  amount: -0.5
-  user: barbu
+  amount: 0.5
   miner: toto
   order: one
 
 out1:
-  amount: 0.8
+  amount: -0.8
   miner: toto
   txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1
@@ -53,5 +42,11 @@ out1:
 withdraw1:
   amount: -1
   user: barbu
+  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
+  vout: 1
+
+in_buyer:
+  amount: 0.01
+  user: buyer
   txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1

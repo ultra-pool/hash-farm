@@ -7,4 +7,12 @@ class Miner < ActiveRecord::Base
   def hashrate( *args, **hargs )
     workers.map { |w| w.hashrate( *args, **hargs ) }.sum
   end
+
+  def balance
+    Transfer.of(self).pluck(:amount).sum
+  end
+
+  def payable?
+    balance > HashFarm.config.pool.min_payout
+  end
 end

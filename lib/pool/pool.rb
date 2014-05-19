@@ -209,7 +209,7 @@ class Pool
 
   def to_s
     nb_max = 3
-    s = "%s : %d workers, %.1f MH/s, %.1f mBTC/MHs/day" % [@name, @workers.size, hashrate * 10**-6, profitability.to_mbtc]
+    s = "%s : %d workers, %.1f MH/s, %.1f mBTC/MHs/day" % [@name, @workers.size, hashrate * 10**-6, profitability.btc.to_mbtc]
     return s if @workers.size == 0
     s += " " + @workers[0...nb_max].map(&:name).to_s
     s += "...%d more]" % (@workers.size - nb_max) if @workers.size > nb_max

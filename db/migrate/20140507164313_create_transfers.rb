@@ -9,5 +9,7 @@ class CreateTransfers < ActiveRecord::Migration
 
       t.timestamps
     end
+
+    add_reference :shares, :transfer, index: true
   end
 end

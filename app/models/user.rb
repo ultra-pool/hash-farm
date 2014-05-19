@@ -1,12 +1,16 @@
 class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable, :recoverable, :rememberable, :trackable, :validatable, :confirmable
-  
+
+  # BEFORE VALIDATION
+
   before_validation :set_is_admin, if: -> { self.is_admin.nil? }
 
   def set_is_admin
     self.is_admin = false
     true
   end
+
+  # INSTANCE METHODS
 
   def deposit_key
     if HashFarm.config.serialized_master_key[:private].nil?
@@ -19,5 +23,9 @@ class User < ActiveRecord::Base
       key = Bitcoin::Key.new(private_key.to_hex, nil, true)
     end
     key
+  end
+
+  def balance
+    Transfer.of(self).pluck(:amount).sum
   end
 end

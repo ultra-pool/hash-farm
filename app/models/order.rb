@@ -9,6 +9,7 @@ class Order < ActiveRecord::Base
   PAY_MAX = 10 # To prevent user error
 
   belongs_to :user
+  has_many :transfers
   # has_many :submits
 
   # Strings :
@@ -47,6 +48,19 @@ class Order < ActiveRecord::Base
   scope :running, -> { where( running: true ) }
   scope :complete, -> { where( complete: true ) }
   scope :uncomplete, -> { where( complete: false ) }
+
+  # Debit user, initialize and return a new order.
+  def Order.factory( args={} )
+    user, amount, price, limit = args[:user], args[:pay], args[:price], args[:limit]
+    raise "Not enough money in user balance." if user.balance < amount
+    raise "amount is not in acceptable range" if ! amount.between?( PRICE_MIN, PRICE_MAX )
+    raise "price is not in acceptable range" if ! price.between?( PAY_MIN, PAY_MAX )
+    raise "limit is not in acceptable range" if limit.present? && ! limit > 1
+
+    order = Order.create!( **args )
+    transfer = Transfer.create!( user: user, amount: -amount, order: order )
+    order
+  end
 
   def uri() @uri = URI( self.url ); @uri.user = self.username; @uri.password = self.password; @uri end
   def host() uri.host end

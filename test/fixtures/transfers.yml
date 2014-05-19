@@ -2,36 +2,56 @@
 
 one:
   amount: 0.5
-  sender:
-  recipient: one
+  user: one
+  miner:
+  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
+  vout: 1
+
+one:
+  amount: 0.5
+  user: one
+  miner:
   txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1
 
 two:
-  amount: 0.1
-  sender: one
-  recipient: two
+  amount: -0.1
+  user: one
+  miner: two
   txid: 
   vout: 
 
 in1:
-  amount: 1
-  recipient: barbu
+  amount: 2
+  user: barbu
   txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1
 
+order1:
+  amount: -1
+  user: barbu
+  order: one
+
 tf1:
-  amount: 0.5
-  sender: barbu
-  recipient: toto
+  amount: -0.5
+  user: barbu
+  miner: toto
+  order: one
 
 tf2:
-  amount: 0.5
-  sender: barbu
-  recipient: toto
+  amount: -0.5
+  user: barbu
+  miner: toto
+  order: one
 
 out1:
   amount: 0.8
-  sender: toto
+  miner: toto
+  txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
+  vout: 1
+
+withdraw1:
+  amount: -1
+  user: barbu
   txid: f88697be33a08ba6a8065e4f87204f937b5c4a813be46fe8b71c7fd361b2f8d1
   vout: 1

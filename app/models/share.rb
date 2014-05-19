@@ -7,13 +7,14 @@ require 'mining_helper'
 
 class Share < ActiveRecord::Base
   belongs_to :worker
-  belongs_to :payout
+  belongs_to :transfer
   belongs_to :order
   has_one :miner, through: :worker
   
   validates :order, presence: true
 
-  scope :unpaid, -> { where(payout_id: nil) }
+  scope :unpaid, -> { where( 'transfer_id IS NULL' ) }
+  scope :paid, -> { where( 'transfer_id IS NOT NULL' ) }
   scope :accepted, -> { where(our_result: true) }
 
   attr_reader :version, :previous_hash, :merkle_root, :nbits, :ntime, :nonce

@@ -11,32 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140516110430) do
-
-  create_table "accounts", force: true do |t|
-    t.integer  "coin_id",               null: false
-    t.string   "address",    limit: 34, null: false
-    t.string   "label",                 null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "accounts", ["coin_id"], name: "index_accounts_on_coin_id"
-
-  create_table "coins", force: true do |t|
-    t.string   "name",                     limit: 64, null: false
-    t.string   "code",                     limit: 5,  null: false
-    t.integer  "second_per_block",                    null: false
-    t.integer  "difficulty_retarget",                 null: false
-    t.string   "algo",                     limit: 64, null: false
-    t.integer  "block_confirmation",                  null: false
-    t.integer  "transaction_confirmation",            null: false
-    t.string   "rpc_url",                             null: false
-    t.string   "bitcointalk_url"
-    t.string   "website"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
+ActiveRecord::Schema.define(version: 20140519130913) do
 
   create_table "miners", force: true do |t|
     t.string   "address",    null: false
@@ -80,17 +55,19 @@ ActiveRecord::Schema.define(version: 20140516110430) do
   add_index "shares", ["transfer_id"], name: "index_shares_on_transfer_id"
 
   create_table "transfers", force: true do |t|
-    t.decimal  "amount",       precision: 16, scale: 8, null: false
-    t.integer  "sender_id"
-    t.integer  "recipient_id"
+    t.decimal  "amount",     precision: 16, scale: 8, null: false
+    t.integer  "user_id"
     t.string   "txid"
     t.integer  "vout"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "miner_id"
+    t.integer  "order_id"
   end
 
-  add_index "transfers", ["recipient_id"], name: "index_transfers_on_recipient_id"
-  add_index "transfers", ["sender_id"], name: "index_transfers_on_sender_id"
+  add_index "transfers", ["miner_id"], name: "index_transfers_on_miner_id"
+  add_index "transfers", ["order_id"], name: "index_transfers_on_order_id"
+  add_index "transfers", ["user_id"], name: "index_transfers_on_user_id"
 
   create_table "users", force: true do |t|
     t.string   "password",               limit: 64

@@ -63,6 +63,23 @@ class Order < ActiveRecord::Base
     order
   end
 
+  def cancel
+    self.set_complete
+    if Pool[pool_name]
+      # Stop pool
+      self.pool.on('stopped') do
+        # paid shares
+        self.pay!
+        # recrédite du order.amount qu'il reste après les payouts.
+        Transfer.create!( order: self, user: user, amount: self.pay )
+      end
+      self.pool.stop
+    else
+      self.pay!
+      Transfer.create!( order: self, user: user, amount: self.pay )
+    end
+  end
+
   def uri() @uri = URI( self.url ); @uri.user = self.username; @uri.password = self.password; @uri end
   def host() uri.host end
   def port() uri.port end

@@ -91,4 +91,24 @@ class Transfer < ActiveRecord::Base
 
   # obj can be a User, Miner or Order
   scope :of, -> (obj) { where( obj.class.name.underscore.to_sym => obj ) }
+
+  # # Return a Hash of TxOut, each TxOut is an Address and an amount to pay.
+  # def Transfer.send_payout!
+  #   all_tfs = Transfer.mini_payouts.unpaid
+  #   all_tfs_grouped = all_tfs.group_by(&:miner)
+
+  #   tx = all_tfs_grouped.map { |miner, tfs|
+  #     tfs.each { |tf| tf.paid = }
+  #     [tf.miner.address, tfs.map(&:amount).sum]
+  #   }.to_h
+
+  #   btc_tx = Something.create_btc_tx( tx )
+  #   # create a tf per miner to clear balance
+  #   all_tfs_grouped.each { |miner, tfs|
+  #     vout = btc_tx.outs.index(miner.address)
+  #     amount = btc_tx.outs[vout]
+  #     Transfer.create!( miner: miner, amount: -amount, txid: btc_tx.id, vout: vout )
+  #   }
+  #   btc_tx
+  # end
 end

@@ -28,4 +28,18 @@ class User < ActiveRecord::Base
   def balance
     Transfer.of(self).pluck(:amount).sum
   end
+
+  def received_credit( btc_tx )
+    vout = btc_tx.outs.index(user.wallet_address)
+    amount = btc_tx.outs[vout]
+    Transfer.create!( user: self, amount: amount, txid: btc_tx.id, vout: vout )
+  end
+
+  # def withdraw( address, amount=nil )
+  #   raise "assert amount <= user.balance failed" if amount.present? && amount > balance
+  #   amount ||= balance
+  #   btc_tx = Something.create_btc_tx( address => amount )
+  #   Transfer.create!( user: self, amount: -amount, txid: btc_tx.id, vout: btc_tx.outs.index(address) )
+  #   btc_tx
+  # end
 end

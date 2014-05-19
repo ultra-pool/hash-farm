@@ -124,49 +124,46 @@ class Order < ActiveRecord::Base
     update!( running: bool )
   end
 
-  # # Get payable shares for this order, group them by user,
-  # # and create a Tranfer to pay him.
-  # # Get a pool fee for each transfer.
-  # def pay_miners!
-  #   pool_fees = HashFarm.config.pool.fees_percent
+  # Get payable shares for this order, group them by miner,
+  # and create a Tranfer to pay him.
+  # Get a pool fee for each transfer.
+  def pay_miners!
+    pool_fees = HashFarm.config.pool.fees_percent
+    pool_fees /= 100.0 if pool_fees >= 0.1
 
-  #   # Compute how much we must pay.
-  #   to_pay_shares = shares.payable
-  #   total_diff = shares.map(&:difficulty).sum
-  #   total_nb_hash = MiningHelper.difficulty_to_nb_hash( total_diff )
-  #   to_pay = (total_nb_hash.to_f * price / 10**2 / 1.day).round.btc # * 10**8 / 10**6
-  #   to_pay = self.pay.btc - self.paid.btc if to_pay + self.paid.btc > self.pay.btc
-  #   raise "Fail on assert to_pay <= order.user.balance" if to_pay > self.user.balance.btc
+    # Compute how much we must pay.
+    to_pay_shares = shares.payable
+    total_diff = shares.map(&:difficulty).sum
+    total_nb_hash = MiningHelper.difficulty_to_nb_hash( total_diff )
+    to_pay = (total_nb_hash.to_f * price / 10**2 / 1.day).round.btc # * 10**8 / 10**6
+    to_pay = self.pay.btc if to_pay > self.pay.btc
 
-  #   # Create a Transfer per user, 
-  #   tfs = to_pay_shares.group_by(&:user).map { |miner, user_shares|
-  #     # Compute user part of to_pay
-  #     user_total_diff = user_shares.map(&:difficulty).sum
-  #     user_part = ( to_pay * user_total_diff.to_f / total_diff ).floor
-  #     # 
-  #     user_percentage = 1 - ( pool_fees < 0.1 ? pool_fees : pool_fees / 100.0 )
-  #     #
-  #     user_amount = (user_part * user_percentage).floor
-  #     tf = Transfer.create!( sender: self.user, recipient: miner, amount: user_amount.to_btc )
-  #     user_shares.each { |s| s.transfer = tf; s.save! }
-  #     tf
-  #   }
+    # Create a Transfer per miner,
+    tfs = to_pay_shares.group_by(&:miner).map { |miner, miner_shares|
+      # Compute miner part of to_pay
+      miner_total_diff = miner_shares.map(&:difficulty).sum
+      miner_part = ( to_pay * miner_total_diff.to_f / total_diff ).floor
+      miner_amount = (miner_part * (1 - pool_fees)).floor
+      tf = Transfer.create!( miner: self.miner, order: self, amount: miner_amount.to_btc )
+      miner_shares.each { |s| s.transfer = tf; s.save! }
+      tf
+    }
 
-  #   # Compute our pool fees
-  #   fees_user = User.find_or_create_by!( payout_address: HashFarm.config.pool.fees_address )
-  #   fees_amount = to_pay - tfs.map(&:amount).sum.btc
-  #   pool_fees_tf = Transfer.create!( sender: self.user, recipient: fees_user, amount: fees_amount.to_btc )
-  #   raise "Fail on assert tfs.sum + pool.fees == to_pay" if tfs.map(&:amount).sum.btc + pool_fees_tf.amount.btc != to_pay
+    # Compute our pool fees
+    fees_miner = miner.find_or_create_by!( address: HashFarm.config.pool.fees_address )
+    fees_amount = to_pay - tfs.map(&:amount).sum.btc
+    raise "Fail on assert tfs.sum + pool.fees == to_pay" if tfs.map(&:amount).sum.btc + fees_amount != to_pay
+    pool_fees_tf = Transfer.create!( order: self, miner: fees_miner, amount: fees_amount.to_btc )
 
-  #   self.paid += to_pay.to_btc
-  #   raise "Fail on assert self.paid <= self.pay" if self.paid > self.pay
+    self.pay -= to_pay.to_btc
+    raise "Fail on assert self.pay > 0" if self.pay < 0
 
-  #   self.complete = true if self.paid == self.pay
-  #   save!
-  # end
+    self.complete = true if self.pay == 0
+    save!
+  end
 
-  # # Pay all alive order.
-  # def Order.pay_miners!
-  #   Order.alive.each(&:pay!)
-  # end
+  # Pay all alive order.
+  def Order.pay_miners!
+    Order.alive.each(&:pay!)
+  end
 end

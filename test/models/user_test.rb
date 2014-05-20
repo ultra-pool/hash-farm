@@ -29,4 +29,44 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 0, users(:toto).balance
     assert_equal 0.5, users(:one).balance
   end
+
+  test "it should create transfer when received_credit" do
+    barbu = users(:barbu)
+    txid = "d1e21e283d5e917b2ddd01c0a579d41d4b0e60062890f1958485ea86b3f24743"
+    btc_tx = OpenStruct.new(
+      id: txid,
+      outs: [OpenStruct.new( address: barbu.wallet_address, amount: 1.5 )]
+    )
+    old_balance = barbu.balance
+    barbu.received_credit( btc_tx )
+    assert_equal old_balance + 1.5, barbu.balance
+    tf = barbu.transfers.credits.last
+    assert_equal barbu, tf.user
+    assert_equal txid, tf.txid
+    assert_equal 0, tf.vout
+    assert_equal 1.5, tf.amount
+  end
+
+  test "it should create transfer on withdraw" do
+    barbu = users(:barbu)
+
+    create_btc_mock = -> (tx) {
+      txid = "d1e21e283d5e917b2ddd01c0a579d41d4b0e60062890f1958485ea86b3f24743"
+      btc_tx = OpenStruct.new(
+        id: txid,
+        outs: tx
+      )
+    }
+
+    old_balance = barbu.balance
+    skip("Create BTC Tx not implemented yet")
+    btc_tx = barbu.withdraw
+    tf = barbu.transfers.withdraws.last
+
+    assert_equal 0, barbu.balance
+    assert_equal barbu, tf.user
+    assert_equal txid, tf.txid
+    assert_equal 0, tf.vout
+    assert_equal old_balance, tf.amount
+  end
 end

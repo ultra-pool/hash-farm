@@ -22,6 +22,8 @@ class Order < ActiveRecord::Base
   # Booleans :
   # attr_accessible :running, :complete
   
+  # BEFORE VALIDATION
+
   before_validation do
     uri = URI(self.url) rescue nil
     next false if uri.nil?
@@ -34,21 +36,28 @@ class Order < ActiveRecord::Base
     self.username && uri.host =~ /^[\w\.-]+$/
   end
 
+  # VALIDATION
+
   validates :url, :username, :pay, :price, presence: true
   validate :url_is_well_formed
-  def url_is_well_formed
-    URI( self.url ).host.present? rescue false
-  end
-  validates :pay, numericality: { greater_than_or_equal_to: PAY_MIN }
+  validates :pay, numericality: { greater_than_or_equal_to: PAY_MIN }, on: :create
   validates :pay, numericality: { less_than_or_equal_to: PAY_MAX }
   validates :price, numericality: { greater_than_or_equal_to: PRICE_MIN }
   validates :price, numericality: { less_than_or_equal_to: PRICE_MAX }
+
+  def url_is_well_formed
+    URI( self.url ).host.present? rescue false
+  end
+
+  # SCOPES
 
   scope :waiting, -> { where( running: false ) }
   scope :running, -> { where( running: true ) }
   scope :alive, -> { uncomplete }
   scope :complete, -> { where( complete: true ) }
   scope :uncomplete, -> { where( complete: false ) }
+
+  # MODEL METHODS
 
   # Debit user, initialize and return a new order.
   def Order.factory( args={} )
@@ -62,6 +71,13 @@ class Order < ActiveRecord::Base
     transfer = Transfer.create!( user: user, amount: -amount, order: order )
     order
   end
+
+  # Pay all alive order.
+  def Order.pay_miners!
+    Order.alive.each(&:pay!)
+  end
+
+  # INSTANCES METHODS
 
   def cancel
     self.set_complete
@@ -135,7 +151,7 @@ class Order < ActiveRecord::Base
     to_pay_shares = shares.payable
     total_diff = shares.map(&:difficulty).sum
     total_nb_hash = MiningHelper.difficulty_to_nb_hash( total_diff )
-    to_pay = (total_nb_hash.to_f * price / 10**2 / 1.day).round.btc # * 10**8 / 10**6
+    to_pay = (total_nb_hash.to_f * price / 10**2 / 1.day).btc.round # * 10**8 / 10**6
     to_pay = self.pay.btc if to_pay > self.pay.btc
 
     # Create a Transfer per miner,
@@ -144,13 +160,13 @@ class Order < ActiveRecord::Base
       miner_total_diff = miner_shares.map(&:difficulty).sum
       miner_part = ( to_pay * miner_total_diff.to_f / total_diff ).floor
       miner_amount = (miner_part * (1 - pool_fees)).floor
-      tf = Transfer.create!( miner: self.miner, order: self, amount: miner_amount.to_btc )
+      tf = Transfer.create!( miner: miner, order: self, amount: miner_amount.to_btc )
       miner_shares.each { |s| s.transfer = tf; s.save! }
       tf
     }
 
     # Compute our pool fees
-    fees_miner = miner.find_or_create_by!( address: HashFarm.config.pool.fees_address )
+    fees_miner = Miner.find_or_create_by!( address: HashFarm.config.pool.fees_address )
     fees_amount = to_pay - tfs.map(&:amount).sum.btc
     raise "Fail on assert tfs.sum + pool.fees == to_pay" if tfs.map(&:amount).sum.btc + fees_amount != to_pay
     pool_fees_tf = Transfer.create!( order: self, miner: fees_miner, amount: fees_amount.to_btc )
@@ -160,10 +176,5 @@ class Order < ActiveRecord::Base
 
     self.complete = true if self.pay == 0
     save!
-  end
-
-  # Pay all alive order.
-  def Order.pay_miners!
-    Order.alive.each(&:pay!)
   end
 end

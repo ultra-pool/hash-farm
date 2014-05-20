@@ -96,4 +96,11 @@ class TransferTest < ActiveSupport::TestCase
     assert_equal 3, tfs.size
     assert tfs.all? { |tf| tf.order == @order }
   end
+
+  test "it should create payout" do
+    skip("Create BTC Tx not implemented yet")
+    tfs = Transfer.of( @order )
+    assert_equal 3, tfs.size
+    assert tfs.all? { |tf| tf.order == @order }
+  end
 end

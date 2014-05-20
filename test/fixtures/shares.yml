@@ -49,7 +49,7 @@ payout4:
   reason: MyString
 
 payout5:
-  worker: barbu1
+  worker: toto1
   solution: MyString
   difficulty: 0.01
   our_result: true

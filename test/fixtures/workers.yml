@@ -1,21 +1,21 @@
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  miner: :one
+  miner: one
   name: MyString
 
 two:
-  miner: :two
+  miner: two
   name: 
 
-barbu1:
-  miner: :barbu
+two1:
+  miner: two
   name: barbu1
 
-barbu2:
-  miner: :barbu
+two2:
+  miner: two
   name: barbu2
 
 toto1:
-  miner: :barbu
+  miner: toto
   name: toto1

@@ -1,13 +1,12 @@
 require 'test_helper'
 
 class WorkerTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
   setup do
-    @w = workers(:barbu1)
+    @w = workers(:toto1)
   end
+
   test 'it should compute hashrate' do
+    # Create shares to compute hashrate
     t = populate
 
     # hashrate = @w.hashrate

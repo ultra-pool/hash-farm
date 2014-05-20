@@ -88,11 +88,13 @@ class Order < ActiveRecord::Base
         self.pay!
         # recrédite du order.amount qu'il reste après les payouts.
         Transfer.create!( order: self, user: user, amount: self.pay )
+        self.update!( pay: 0 )
       end
       self.pool.stop
     else
       self.pay!
       Transfer.create!( order: self, user: user, amount: self.pay )
+      self.update!( pay: 0 )
     end
   end
 
@@ -160,6 +162,7 @@ class Order < ActiveRecord::Base
       miner_total_diff = miner_shares.map(&:difficulty).sum
       miner_part = ( to_pay * miner_total_diff.to_f / total_diff ).floor
       miner_amount = (miner_part * (1 - pool_fees)).floor
+      raise "Fail on assert miner_amount > 0" if miner_amount <= 0
       tf = Transfer.create!( miner: miner, order: self, amount: miner_amount.to_btc )
       miner_shares.each { |s| s.transfer = tf; s.save! }
       tf

@@ -4,7 +4,7 @@ Hash Farm
 HashFarm is intended to be a hashrate leaser.
 HashFarm assure buyers to get the hashrate they paid for, and miners to be paid for the shares they share.
 
-Miners just connect to us at www.hash.farm:3333
+Miners just connect to us at www.hash.farm:3333 <--this link is dead
 
 CGMiner is to old and buggy and doesn't work with our pool.
 Miners must use CPUMiner or SGMiner.
@@ -26,7 +26,7 @@ Installation
 
 ### Installation
 
-  bundle install
+  bundle install (some file might now writeable so use sudo in front)
 
 Configuration
 -------------

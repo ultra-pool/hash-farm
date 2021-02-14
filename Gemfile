@@ -10,7 +10,7 @@ gem 'coffee-rails', '~> 4.2.2'
 gem 'therubyracer', platforms: :ruby
 gem 'jquery-rails'
 gem 'turbolinks'
-gem 'jbuilder', '~> 1.2'
+gem 'jbuilder', '~> 2.6'
 gem 'eventmachine'
 gem 'bitcoin-ruby', git: 'https://github.com/lian/bitcoin-ruby', branch: 'master', require: 'bitcoin'
 gem 'ruby-scrypt', git: 'https://github.com/timmy72/ruby-scrypt', branch: 'master', require: 'scrypt'
